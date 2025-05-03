@@ -48,7 +48,10 @@ export default defineConfig({
             "fa6-solid": ["*"],
         },
 		}), svelte(), sitemap(), expressiveCode({
-            themes: ["catppuccin-frappe", "light-plus"],
+            themes: ["one-dark-pro", "light-plus"],
+            styleOverrides:{
+                codeFontFamily:"Maple Mono"
+            }
         }
         )],
     markdown: {

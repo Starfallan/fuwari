@@ -194,8 +194,8 @@ http {
 
 ## 3. 美化配置
 
-> [!NOTE] 参考
-> https://linux.do/t/topic/440439
+> [!NOTE] 
+> 参考来源 https://linux.do/t/topic/440439
 
 1. 建立自定义文件夹 `open-webui-assets-custom`
 2. 对应目录下建立 fonts 文件夹，文件夹中放自定义字体
