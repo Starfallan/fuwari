@@ -3,7 +3,7 @@ title: OpenWebui部署
 published: 2025-05-03
 description: ''
 image: ''
-tags: [AI，Docker，Nginx，Linux]
+tags: [AI, Docker, Nginx, Linux]
 category: 'AI'
 draft: false 
 lang: ''
