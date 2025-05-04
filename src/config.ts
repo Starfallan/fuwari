@@ -59,7 +59,7 @@ export const profileConfig: ProfileConfig = {
 		{
 			name: 'NetEaseMusic',
 			icon: 'tabler:brand-netease-music',
-			url: 'https://music.163.com/#/user/home?id=1997803975',
+			url: 'https://music.163.com/#/user/home?id=331341358',
 		},
 		// 添加Email
 		{
