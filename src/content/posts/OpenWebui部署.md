@@ -54,16 +54,9 @@ networks:
 ## 2. 配置 Nginx （含有 websocket 和缓存加速）
 
 ### 主配置文件 `/etc/nginx/nginx.conf`
-```bash
-user nginx;
-worker_processes auto;
-error_log /var/log/nginx/error.log warn;
-pid /var/run/nginx.pid;
-
-events {
-    worker_connections 1024;
-}
-
+```bash title="nginx.conf" ins{4-10}
+# 只需要在原有的 http {} 中添加以下配置即可
+# 其他配置保持不变
 http {
     # 缓存配置
     proxy_cache_path /var/cache/nginx
@@ -72,35 +65,11 @@ http {
         max_size=100m
         inactive=24h
         use_temp_path=off;
-
-    # 基本配置
-    include       /etc/nginx/mime.types;
-    default_type  application/octet-stream;
-    
-    # 日志格式
-    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                      '$status $body_bytes_sent "$http_referer" '
-                      '"$http_user_agent" "$http_x_forwarded_for"';
-    
-    access_log  /var/log/nginx/access.log  main;
-    
-    # 性能优化
-    sendfile        on;
-    keepalive_timeout  65;
-    tcp_nodelay     on;
-    
-    # gzip压缩
-    gzip  on;
-    gzip_comp_level 6;
-    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
-
-    # 引入所有的配置文件
-    include /etc/nginx/conf.d/*.conf;
 }
 ```
 
 ### 子配置文件 `/etc/nginx/conf.d/openwebui.conf`
-```bash
+```bash title="openwebui.conf"
 # 定义上游服务器
 upstream openwebui {
     server 127.0.0.1:3000;
@@ -248,3 +217,51 @@ open-webui-assets-custom/
     font-display: swap;
 }
 ```
+
+## 4. 测试 Nginx 缓存是否生效
+
+在配置完成后，可以通过以下几种方法测试缓存是否生效：
+
+### 4.1 查看响应头中的缓存状态
+
+1. 使用浏览器开发者工具（F12）打开网络面板
+2. 刷新页面并查找对 `/api/models` 的请求
+3. 在响应头中查看 `X-Cache-Status` 字段：
+   - `MISS`: 表示请求未命中缓存，从上游服务器获取
+   - `HIT`: 表示请求命中缓存，直接从缓存返回
+   - `BYPASS`: 表示请求绕过了缓存
+   - `EXPIRED`: 表示缓存已过期
+   - `UPDATING`: 表示缓存正在更新
+
+### 4.2 使用 curl 命令行工具测试
+
+```bash
+# 第一次请求，应该显示 MISS
+curl -I -H "Host: chat.170529.xyz" https://chat.170529.xyz/api/models | grep X-Cache-Status
+
+# 第二次请求，如果缓存有效，应该显示 HIT
+curl -I -H "Host: chat.170529.xyz" https://chat.170529.xyz/api/models | grep X-Cache-Status
+```
+
+### 4.3 检查缓存文件
+
+查看 Nginx 缓存目录中是否有文件生成：
+
+```bash
+# 查看缓存目录
+ls -la /var/cache/nginx
+
+# 检查缓存目录大小
+du -sh /var/cache/nginx
+```
+
+### 4.4 查看 Nginx 缓存日志
+
+如果你配置了缓存日志，可以查看日志来确认缓存状态：
+
+```bash
+# 查看 Nginx 访问日志
+grep "X-Cache-Status" /var/log/nginx/nginx.openwebui.access.log
+```
+
+缓存成功的特征是：当你第一次访问某个资源时，`X-Cache-Status` 显示 `MISS`，而后续访问同一资源时显示 `HIT`，并且你会注意到第二次请求的响应时间明显缩短。
