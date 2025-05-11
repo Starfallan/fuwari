@@ -49,14 +49,23 @@ services:
 networks:
   newapi:
     external: true
-
-
 ```
+
 ## 2. 配置 Nginx （含有 websocket 和缓存加速）
+
+### 主配置文件 `/etc/nginx/nginx.conf`
 ```bash
-# 注意：proxy_cache_path 指令必须放在 http 配置块中
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log warn;
+pid /var/run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
 
 http {
+    # 缓存配置
     proxy_cache_path /var/cache/nginx
         levels=1:2
         keys_zone=nginx_cache:1m
@@ -64,132 +73,139 @@ http {
         inactive=24h
         use_temp_path=off;
 
-    upstream openwebui {
-        server 127.0.0.1:3000;
-    }
-
-    include       mime.types;
+    # 基本配置
+    include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
+    
+    # 日志格式
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+    
+    access_log  /var/log/nginx/access.log  main;
+    
+    # 性能优化
+    sendfile        on;
     keepalive_timeout  65;
+    tcp_nodelay     on;
+    
+    # gzip压缩
+    gzip  on;
+    gzip_comp_level 6;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 
-    # 日志格式等其他 http 级别配置...
-    # log_format main '...';
+    # 引入所有的配置文件
+    include /etc/nginx/conf.d/*.conf;
+}
+```
 
-    server {
-        listen 80;
-        listen [::]:80;
-        listen 443 ssl http2; # 合并 listen 指令
-        listen [::]:443 ssl http2; # 合并 listen 指令
-        server_name chat.170529.xyz;
-
-        # SSL 配置
-        ssl_certificate      /etc/letsencrypt/live/chat.170529.xyz/fullchain.pem;
-        ssl_certificate_key  /etc/letsencrypt/live/chat.170529.xyz/privkey.pem;
-        ssl_protocols TLSv1.2 TLSv1.3;
-        ssl_ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256;
-        ssl_prefer_server_ciphers on;
-        ssl_session_cache shared:SSL:10m;
-        ssl_session_timeout 10m;
-
-        # 安全头部
-        add_header Strict-Transport-Security "max-age=31536000"; # 建议放在 HTTPS 配置部分
-        add_header X-Frame-Options SAMEORIGIN;
-        add_header X-Content-Type-Options nosniff;
-        add_header X-XSS-Protection "1; mode=block";
-        add_header Referrer-Policy "strict-origin-when-cross-origin";
-
-        # 日志
-        access_log   /var/log/nginx/nginx.openwebui.access.log main;
-        error_log    /var/log/nginx/nginx.openwebui.error.log;
-
-        # HTTP 到 HTTPS 重定向 (应放在配置靠前的位置)
-        if ($scheme = http) {
-            return 301 https://$host$request_uri;
-        }
-        error_page 497 https://$host$request_uri; # 处理非标准端口的 HTTP 请求
-
-        # ACME challenge
-        location ^~ /.well-known/acme-challenge {
-            allow all;
-            root /usr/share/nginx/html;
-        }
-
-        # 拒绝访问隐藏文件
-        location ~ /\. {
-            deny all;
-        }
-
-        # models cache
-        location /api/models {
-            proxy_pass http://openwebui;
-            proxy_cache nginx_cache;
-            proxy_cache_key $request_uri;
-            proxy_cache_valid 200 30m;
-            proxy_cache_background_update on;
-            proxy_cache_use_stale updating;
-            proxy_cache_revalidate on;
-            proxy_cache_min_uses 1;
-
-            proxy_http_version 1.1; # 需要为 upgrade/connection
-            proxy_set_header Upgrade $http_upgrade; # 传递 upgrade 头
-            proxy_set_header Connection "upgrade"; # 传递 connection 头
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-
-            add_header X-Cache-Status $upstream_cache_status;
-        }
-
-        # Static resources browser cache
-        location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)(.*)$ {
-            proxy_pass http://openwebui;
-            proxy_http_version 1.1;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-
-            expires 1d;
-            add_header Cache-Control "public, no-transform";
-        }
-
-        # 反向代理配置 (通用)
-        location / {
-            proxy_pass http://openwebui;
-            proxy_http_version 1.1; # 需要为 upgrade/connection
-            proxy_set_header Upgrade $http_upgrade; # 支持 Websockets
-            proxy_set_header Connection "upgrade"; # 支持 Websockets
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme; # 传递原始协议
-
-            # 禁用流式响应缓冲 (SSE)
-            proxy_buffering off;
-            proxy_cache off; # 此 location 不缓存
-
-            # 连接超时 (1 小时，请确认是否必要，特别是 connect/send)
-            proxy_connect_timeout 3600s; # 连接后端超时
-            proxy_read_timeout 3600s;    # 读取后端响应超时 (SSE 可能需要较长)
-            proxy_send_timeout 3600s;     # 发送请求到后端超时
-            # keepalive_timeout 3600; # 此指令不适用于 proxy，应在 http/server 设置客户端 keepalive
-        }
-
-        # index 指令通常在不使用 proxy_pass 时生效，此处可以移除或注释掉
-        # index index.php index.html index.htm default.php default.htm default.html;
-
-        # 移除 server 级别的 proxy_set_header，已在 location 中处理
-        # proxy_set_header Host $host;
-        # proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        # proxy_set_header X-Forwarded-Host $server_name;
-        # proxy_set_header X-Real-IP $remote_addr;
-        # proxy_http_version 1.1;
-        # proxy_set_header Upgrade $http_upgrade;
-        # proxy_set_header Connection $http_connection;
-    }
+### 子配置文件 `/etc/nginx/conf.d/openwebui.conf`
+```bash
+# 定义上游服务器
+upstream openwebui {
+    server 127.0.0.1:3000;
 }
 
+server {
+    listen 80;
+    listen [::]:80;
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name chat.170529.xyz;
+
+    # SSL 配置
+    ssl_certificate      /etc/letsencrypt/live/chat.170529.xyz/fullchain.pem;
+    ssl_certificate_key  /etc/letsencrypt/live/chat.170529.xyz/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+
+    # 安全头部
+    add_header Strict-Transport-Security "max-age=31536000";
+    add_header X-Frame-Options SAMEORIGIN;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+    add_header Referrer-Policy "strict-origin-when-cross-origin";
+
+    # 日志
+    access_log   /var/log/nginx/nginx.openwebui.access.log main;
+    error_log    /var/log/nginx/nginx.openwebui.error.log;
+
+    # HTTP 到 HTTPS 重定向
+    if ($scheme = http) {
+        return 301 https://$host$request_uri;
+    }
+    error_page 497 https://$host$request_uri;
+
+    # ACME challenge
+    location ^~ /.well-known/acme-challenge {
+        allow all;
+        root /usr/share/nginx/html;
+    }
+
+    # 拒绝访问隐藏文件
+    location ~ /\. {
+        deny all;
+    }
+
+    # models cache
+    location /api/models {
+        proxy_pass http://openwebui;
+        proxy_cache nginx_cache;
+        proxy_cache_key $request_uri;
+        proxy_cache_valid 200 30m;
+        proxy_cache_background_update on;
+        proxy_cache_use_stale updating;
+        proxy_cache_revalidate on;
+        proxy_cache_min_uses 1;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        add_header X-Cache-Status $upstream_cache_status;
+    }
+
+    # Static resources browser cache
+    location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)(.*)$ {
+        proxy_pass http://openwebui;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        expires 1d;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    # 反向代理配置 (通用)
+    location / {
+        proxy_pass http://openwebui;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # 禁用流式响应缓冲 (SSE)
+        proxy_buffering off;
+        proxy_cache off;
+
+        # 连接超时设置
+        proxy_connect_timeout 3600s;
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+    }
+}
 ```
 
 ## 3. 美化配置
