@@ -81,9 +81,9 @@ export const profileConfig: ProfileConfig = {
 	bio: "May you, the beauty of this world, always shine",
 	links: [
 		{
-			name: 'NetEaseMusic',
-			icon: 'tabler:brand-netease-music',
-			url: 'https://music.163.com/#/user/home?id=331341358',
+			name: "NetEaseMusic",
+			icon: "tabler:brand-netease-music",
+			url: "https://music.163.com/#/user/home?id=331341358",
 		},
 		// 添加Email
 		{
