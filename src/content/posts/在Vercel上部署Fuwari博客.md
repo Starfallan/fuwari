@@ -104,7 +104,7 @@ export const profileConfig: ProfileConfig = {
 # 4.博客优化配置
 ## 4.1优化目录显示
 打开目录后，在我的设备上，目录是无法正常显示的。一开始是以为目录配置出错，查询了代码后，才发现目录会在小屏幕上默认隐藏，但是在我的 16:9 的 1920 x 1080 的笔记本屏幕上，目录仍然是无法正常显示。尝试修改显示代码，进行优化。方法来自于 [Disappear TOC · Issue #311 · saicaca/fuwari](https://github.com/saicaca/fuwari/issues/311)
-```astro title="src\layouts\MainGridLayout.astro" ins={3,7} del={2,6} showLineNumbers
+```astro title="src\layouts\MainGridLayout.astro" ins={3,7} del={2,6}
 <!-- 将原有的2xl:block改为xl:block，即修改触发宽度 -->
 <div class="absolute w-full z-0 hidden 2xl:block">
 <div class="absolute w-full z-0 hidden xl:block"> 
@@ -141,7 +141,7 @@ export const profileConfig: ProfileConfig = {
 按照顺序配置好之后，下方会自动生成对应代码，暂时不用复制，我们需要进行一定的修改以适应暗色模式。
 这里暗色模式的配置来自于[在Fuwari中添加评论功能(带黑暗模式) - 伊卡的记事本](https://ikamusume7.org/posts/frontend/comments_with_darkmode/)，感谢大佬的思路。
 1. 在 `src\components\widget` 目录下新建 `Comments.svelte` 文件，将上面 Giscus生成的代码替换掉data-themen 对应行就行。
-```svelte title="src\components\widget\Comments.svelte" 
+```svelte title="src\components\widget\Comments.svelte"
 <section>
     <script src="https://giscus.app/client.js"
         data-repo="[在此输入仓库]"
@@ -190,23 +190,21 @@ window.onload = () => {
 
 2. 修改文件 `src\pages\posts\[...slug].astro` 中的代码
 首先引入 `Comments` 组件
-```astro title="src\pages\posts\[...slug].astro"  ins {7}
+```diff astro title="src\pages\posts\[...slug].astro"
 import MainGridLayout from '../layouts/MainGridLayout.astro'
 
 import { getEntry } from 'astro:content'
 import { i18n } from '../i18n/translation'
 import I18nKey from '../i18n/i18nKey'
 import Markdown from '@components/misc/Markdown.astro'
-import Comments from '@components/widget/Comments.svelte'
++ import Comments from '@components/widget/Comments.svelte'
 
 const friendsPost = await getEntry('spec', 'friends')
 ```
 
 之后用组件代码代替原先的代码
 将末尾的原 Giscus 代码换成对应组件
-```astro title="src\pages\posts\[...slug].astro" del {3-17} ins {18}
-    </div>
-
+```astro title="src\pages\posts\[...slug].astro" ins={16} del={1-15}
 <script src="https://giscus.app/client.js"
         data-repo="[在此输入仓库]"
         data-repo-id="[在此输入仓库 ID]"
@@ -288,7 +286,7 @@ code {
     }
 ```
 但是如果你和我一样使用了 `Expressive Code` 替换了原有的代码块显示见[4.4 增强代码块](## 4.4增强代码块)，则需要修改对应配置文件，参考了官方文档 [Style Overrides | Expressive Code](https://expressive-code.com/reference/style-overrides/)
-```astro title="astro.config.mjs" showLineNumbers ins {18-20}
+```astro title="astro.config.mjs" showLineNumbers ins={18-20}
 .....省略前面内容
       include: {
           "preprocess: vitePreprocess(),": ["*"],
