@@ -36,7 +36,14 @@ importers:
       '@astrojs/tailwind':
         specifier: ^6.0.2
         version: 6.0.2(astro@5.7.13(@types/node@22.15.17)(jiti@1.21.7)(lightningcss@1.29.3)(rollup@2.79.2)(sass@1.80.4)(stylus@0.64.0)(terser@5.39.0)(typescript@5.8.3)(yaml@2.7.0))(tailwindcss@3.4.17)
+<<<<<<< HEAD
 >>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
+=======
+      '@fontsource-variable/jetbrains-mono':
+      '@expressive-code/plugin-line-numbers':
+        specifier: ^0.41.2
+        version: 0.41.2
+>>>>>>> dfcad1c (fix: update astro and tailwind dependencies in pnpm-lock.yaml)
       '@fontsource-variable/jetbrains-mono':
         specifier: ^5.2.5
         version: 5.2.5
@@ -7174,6 +7181,7 @@ snapshots:
   '@iconify-json/tabler@1.2.17':
     dependencies:
       '@iconify/types': 2.0.0
+<<<<<<< HEAD
 
   '@iconify/svelte@4.2.0(svelte@5.28.2)':
     dependencies:
@@ -7189,6 +7197,9 @@ snapshots:
       '@iconify/types': 2.0.0
       svelte: 5.30.1
 >>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
+=======
+      svelte: 5.30.1
+>>>>>>> dfcad1c (fix: update astro and tailwind dependencies in pnpm-lock.yaml)
 
   '@iconify/tools@4.1.2':
     dependencies:
