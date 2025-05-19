@@ -19,7 +19,7 @@ lang: ''
 ## 1.3归于 Astro
 ### 1.3.1原因
 其实主要的原因是，又开始心血来潮想部署博客，看到很多人在推荐 Astro，于是便选择了 Astro，我这个人还是比较喜欢花里胡哨的东西，不是很喜欢极简的的类似 Paper 一样的主题，于是最终挑选之下选择了 Fuwari。
-[![Preview Image](https://raw.githubusercontent.com/saicaca/resource/main/fuwari/home.png)](https://raw.githubusercontent.com/saicaca/resource/main/fuwari/home.png)
+![Preview](https://img.170529.xyz/2025/05/20250519220337443.png)
 # 2.安装 Fuwari
 ## 2.1 Fuwari功能特性
 - [x]  基于 Astro 和 Tailwind CSS 开发
