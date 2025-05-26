@@ -14,8 +14,7 @@
   let isCheckingAuth = false;
   let authError = '';
   const dispatch = createEventDispatcher();
-  
-  onMount(() => {
+    onMount(() => {
     // 检查文章是否需要加密
     if (!encrypted) {
       isUnlocked = true;
@@ -26,15 +25,27 @@
       const authData = localStorage.getItem(tokenKey);
       
       if (authData) {
-        try {
+        try {          
           const auth = JSON.parse(authData);
-          if (auth && auth.username && auth.password) {
-            validateBasicAuth(auth.username, auth.password);
+          if (auth && auth.password) {
+            validateBasicAuth("user", auth.password);
           }
         } catch (e) {
           console.error('无效的本地存储数据:', e);
           localStorage.removeItem(tokenKey);
         }
+      }
+
+      // 检查URL中是否有已解锁状态的查询参数
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('unlocked') === 'true') {
+        isUnlocked = true;
+        dispatch('unlocked', true);
+        
+        const unlockEvent = new CustomEvent('article-unlocked', {
+          detail: { slug }
+        });
+        window.dispatchEvent(unlockEvent);
       }
     }
   });
@@ -42,26 +53,28 @@
     isCheckingAuth = true;
     authError = '';
     
-    try {
-      // 使用 Basic Auth 请求保护的内容 API
-      const encodedAuth = btoa(`${username}:${password}`);
+    try {      // 使用 Basic Auth 请求保护的内容 API
+      // 任意用户名，因为我们的API不验证用户名，只验证密码
+      const anyUsername = "user";
+      const encodedAuth = btoa(`${anyUsername}:${password}`);
       
-      const response = await fetch(`/api/protected-content/${slug}`, {
+      // 确保 URL 路径末尾有斜杠，适应 trailingSlash: "always" 配置
+      const response = await fetch(`/api/protected-content/${slug}/`, {
         headers: {
           'Authorization': `Basic ${encodedAuth}`
         }
       });
       
-      if (response.ok) {
+      const data = await response.json();
+      
+      if (response.ok && data.success) {        
         // 验证成功
-        const data = await response.json();
-        
-        // 保存认证信息到本地存储
+        // 保存认证信息到本地存储 (只保存密码即可)
         localStorage.setItem(`encrypted_post_${slug}`, JSON.stringify({
-          username,
           password
         }));
         
+        // 设置解锁状态
         isUnlocked = true;
         dispatch('unlocked', true);
         
@@ -70,9 +83,17 @@
           detail: { slug }
         });
         window.dispatchEvent(unlockEvent);
+        
+        // 如果当前URL没有unlocked参数，添加unlocked=true参数并刷新页面以显示内容
+        const urlParams = new URLSearchParams(window.location.search);
+        if (!urlParams.has('unlocked')) {
+          urlParams.set('unlocked', 'true');
+          const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
+          window.location.href = newUrl;
+        }
       } else {
-        // 验证失败
-        authError = response.status === 401 ? '密码错误' : '验证文章访问权限失败';
+        // 验证失败，使用API返回的错误消息
+        authError = data.message || (response.status === 401 ? '密码错误' : '验证文章访问权限失败');
         localStorage.removeItem(`encrypted_post_${slug}`);
       }
     } catch (err) {
@@ -82,9 +103,9 @@
       isCheckingAuth = false;
     }
   }
-    function handleUnlock(event) {
-    // 密码验证成功，使用 slug 作为用户名，密码作为密码
-    validateBasicAuth(slug, event.detail.password);
+  function handleUnlock(event) {
+    // 密码验证成功，使用任意用户名，只关心密码
+    validateBasicAuth("user", event.detail.password);
   }
 </script>
 

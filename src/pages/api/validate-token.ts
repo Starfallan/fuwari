@@ -1,6 +1,9 @@
 import { validateAccessToken } from '../../utils/token-service';
 import type { APIRoute } from 'astro';
 
+// 将此端点设置为服务端渲染模式，而非静态预渲染
+export const prerender = false;
+
 export const POST: APIRoute = async ({ request }) => {
   try {
     const data = await request.json();

@@ -101,28 +101,47 @@ const jsonLd = {
                 <ImageWrapper id="post-cover" src={entry.data.image} basePath={path.join("content/posts/", getDir(entry.id))} class="mb-8 rounded-xl banner-container onload-animation"/>
             }            <div class="mb-6 markdown-content onload-animation" id="article-content">
               {entry.data.encrypted && <PostContent client:load slug={entry.slug} encrypted={entry.data.encrypted} />}
-              {!entry.data.encrypted && <Markdown><Content /></Markdown>}
-            </div>
-            <script define:vars={{encrypted: entry.data.encrypted}}>
+              <div id="article-content-container" class={entry.data.encrypted ? 'hidden' : ''}>
+                <Markdown class="w-full"><Content /></Markdown>
+              </div>
+            </div>            <script define:vars={{encrypted: entry.data.encrypted}}>
               // 客户端脚本处理加密内容的显示和隐藏
               document.addEventListener('DOMContentLoaded', () => {
-                // 在页面加载时，如果是加密文章，等待解锁事件
+                // 获取内容容器
+                const contentContainer = document.getElementById('article-content-container');
+                
+                // 在页面加载时，如果是加密文章，隐藏内容
                 if (encrypted) {
-                  // 初始时隐藏Markdown内容容器
-                  const markdownContent = document.querySelectorAll('.markdown-content > .astro-code, .markdown-content > p, .markdown-content > h1, .markdown-content > h2, .markdown-content > h3, .markdown-content > h4, .markdown-content > h5, .markdown-content > h6, .markdown-content > ul, .markdown-content > ol, .markdown-content > blockquote, .markdown-content > table');
-                  markdownContent.forEach(el => {
-                    el.style.display = 'none';
-                  });
+                  if (contentContainer) {
+                    contentContainer.classList.add('hidden');
+                  }
                   
                   // 监听PostContent组件的unlocked事件
                   window.addEventListener('article-unlocked', () => {
-                    markdownContent.forEach(el => {
-                      el.style.display = 'block';
-                    });
+                    if (contentContainer) {
+                      contentContainer.classList.remove('hidden');
+                      // 显示加载解锁的提示
+                      const unlockMsg = document.createElement('div');
+                      unlockMsg.className = 'p-3 mb-4 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-md text-center';
+                      unlockMsg.innerHTML = '文章解锁成功';
+                      contentContainer.parentElement?.insertBefore(unlockMsg, contentContainer);
+                      
+                      // 3秒后自动隐藏提示
+                      setTimeout(() => {
+                        unlockMsg.style.transition = 'opacity 0.5s ease-out';
+                        unlockMsg.style.opacity = '0';
+                        setTimeout(() => unlockMsg.remove(), 500);
+                      }, 3000);
+                    }
                   });
                 }
               });
             </script>
+            <style is:inline>
+              .hidden {
+                display: none !important;
+              }
+            </style>
 
             {licenseConfig.enable && <License title={entry.data.title} slug={entry.slug} pubDate={entry.data.published} class="mb-6 rounded-xl license-container onload-animation"></License>}
 
