@@ -7,7 +7,7 @@ tags:
   - 加密
 category: 技术
 encrypted: true
-password: "123456"  # 简单明文密码示例
+password: "12345678"  # 简单明文密码示例
 description: 这是一篇测试加密功能的文章。需要输入密码才能查看完整内容。
 ---
 

@@ -117,7 +117,7 @@ const jsonLd = {
                   }
                   
                   // 监听PostContent组件的unlocked事件
-                  window.addEventListener('article-unlocked', () => {
+                  window.addEventListener('article-unlocked', (event) => {
                     if (contentContainer) {
                       contentContainer.classList.remove('hidden');
                       // 显示加载解锁的提示

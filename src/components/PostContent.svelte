@@ -6,6 +6,7 @@
 <script lang="ts">
   import { onMount, createEventDispatcher } from 'svelte';
   import PasswordInput from './widget/PasswordInput.svelte';
+  import { getValidArticleUnlockStatus, saveArticleUnlockStatus, clearArticleUnlockStatus } from '../utils/article-encrypt-utils';
   
   export let slug: string;
   export let encrypted: boolean;
@@ -19,21 +20,12 @@
     if (!encrypted) {
       isUnlocked = true;
       dispatch('unlocked', true);
-    } else {
-      // 检查本地存储中是否已有有效令牌
-      const tokenKey = `encrypted_post_${slug}`;
-      const authData = localStorage.getItem(tokenKey);
+    } else {      // 检查本地存储中是否已有有效令牌并且未过期
+      const unlockStatus = getValidArticleUnlockStatus(slug);
       
-      if (authData) {
-        try {          
-          const auth = JSON.parse(authData);
-          if (auth && auth.password) {
-            validateBasicAuth("user", auth.password);
-          }
-        } catch (e) {
-          console.error('无效的本地存储数据:', e);
-          localStorage.removeItem(tokenKey);
-        }
+      if (unlockStatus && unlockStatus.password) {
+        // 有有效的解锁状态，使用密码尝试解锁
+        validateBasicAuth("user", unlockStatus.password);
       }
 
       // 检查URL中是否有已解锁状态的查询参数
@@ -66,13 +58,9 @@
       });
       
       const data = await response.json();
-      
-      if (response.ok && data.success) {        
-        // 验证成功
-        // 保存认证信息到本地存储 (只保存密码即可)
-        localStorage.setItem(`encrypted_post_${slug}`, JSON.stringify({
-          password
-        }));
+        if (response.ok && data.success) {          // 验证成功
+        // 保存认证信息到本地存储，包括密码和过期时间，有效期3小时
+        saveArticleUnlockStatus(slug, password, 3);
         
         // 设置解锁状态
         isUnlocked = true;
@@ -90,11 +78,10 @@
           urlParams.set('unlocked', 'true');
           const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
           window.location.href = newUrl;
-        }
-      } else {
+        }      } else {
         // 验证失败，使用API返回的错误消息
         authError = data.message || (response.status === 401 ? '密码错误' : '验证文章访问权限失败');
-        localStorage.removeItem(`encrypted_post_${slug}`);
+        clearArticleUnlockStatus(slug);
       }
     } catch (err) {
       console.error('验证文章访问权限失败:', err);
