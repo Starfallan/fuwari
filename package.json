@@ -12,7 +12,8 @@
     "new-post": "node scripts/new-post.js",
     "format": "biome format --write ./src",
     "lint": "biome check --write ./src",
-    "preinstall": "npx only-allow pnpm"
+    "preinstall": "npx only-allow pnpm",
+    "generate-password": "node scripts/generate-password.js"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -33,7 +34,9 @@
     "astro": "5.7.13",
     "astro-expressive-code": "^0.41.2",
     "astro-icon": "^1.1.5",
+    "bcryptjs": "^3.0.2",
     "hastscript": "^9.0.1",
+    "hono": "^4.7.10",
     "katex": "^0.16.22",
     "markdown-it": "^14.1.0",
     "mdast-util-to-string": "^4.0.0",
@@ -61,7 +64,7 @@
   "devDependencies": {
     "@astrojs/ts-plugin": "^1.10.4",
     "@biomejs/biome": "1.9.4",
-    "@iconify-json/tabler": "^1.2.17",  
+    "@iconify-json/tabler": "^1.2.17",
     "@rollup/plugin-yaml": "^4.1.2",
     "@types/markdown-it": "^14.1.2",
     "@types/mdast": "^4.0.4",

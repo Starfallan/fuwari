@@ -24,6 +24,7 @@ A static blog template built with [Astro](https://astro.build).
 - [ ] Comments
 - [x] Search
 - [x] TOC
+- [x] Password-protected posts
 
 ## require
 
@@ -76,8 +77,12 @@ tags: [Foo, Bar]
 category: Front-end
 draft: false
 lang: jp      # Set only if the post's language differs from the site's language in `config.ts`
+encrypted: false  # Set to true to enable password protection
+password: ""      # Can be plain text or bcrypt hash (use pnpm generate-password to create hash)
 ---
 ```
+
+For more details on creating password-protected posts, see [encrypted-posts.md](./docs/encrypted-posts.md).
 
 ## 🧞 Commands
 
@@ -92,3 +97,4 @@ All commands are run from the root of the project, from a terminal:
 | `pnpm new-post <filename>`          | Create a new post                                |
 | `pnpm astro ...`                    | Run CLI commands like `astro add`, `astro check` |
 | `pnpm astro --help`                 | Get help using the Astro CLI                     |
+| `pnpm generate-password`            | Generate a password hash for encrypted posts     |

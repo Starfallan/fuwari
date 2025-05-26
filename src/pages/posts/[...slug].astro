@@ -4,6 +4,7 @@ import ImageWrapper from "@components/misc/ImageWrapper.astro";
 import License from "@components/misc/License.astro";
 import Markdown from "@components/misc/Markdown.astro";
 import Comments from "@components/widget/Comments.svelte";
+import PostContent from "@components/PostContent.svelte";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
@@ -98,12 +99,30 @@ const jsonLd = {
 
             {entry.data.image &&
                 <ImageWrapper id="post-cover" src={entry.data.image} basePath={path.join("content/posts/", getDir(entry.id))} class="mb-8 rounded-xl banner-container onload-animation"/>
-            }
-
-
-            <Markdown class="mb-6 markdown-content onload-animation">
-                <Content />
-            </Markdown>
+            }            <div class="mb-6 markdown-content onload-animation" id="article-content">
+              {entry.data.encrypted && <PostContent client:load slug={entry.slug} encrypted={entry.data.encrypted} />}
+              {!entry.data.encrypted && <Markdown><Content /></Markdown>}
+            </div>
+            <script define:vars={{encrypted: entry.data.encrypted}}>
+              // 客户端脚本处理加密内容的显示和隐藏
+              document.addEventListener('DOMContentLoaded', () => {
+                // 在页面加载时，如果是加密文章，等待解锁事件
+                if (encrypted) {
+                  // 初始时隐藏Markdown内容容器
+                  const markdownContent = document.querySelectorAll('.markdown-content > .astro-code, .markdown-content > p, .markdown-content > h1, .markdown-content > h2, .markdown-content > h3, .markdown-content > h4, .markdown-content > h5, .markdown-content > h6, .markdown-content > ul, .markdown-content > ol, .markdown-content > blockquote, .markdown-content > table');
+                  markdownContent.forEach(el => {
+                    el.style.display = 'none';
+                  });
+                  
+                  // 监听PostContent组件的unlocked事件
+                  window.addEventListener('article-unlocked', () => {
+                    markdownContent.forEach(el => {
+                      el.style.display = 'block';
+                    });
+                  });
+                }
+              });
+            </script>
 
             {licenseConfig.enable && <License title={entry.data.title} slug={entry.slug} pubDate={entry.data.published} class="mb-6 rounded-xl license-container onload-animation"></License>}
 
