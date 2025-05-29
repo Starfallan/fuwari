@@ -102,7 +102,6 @@ function parseArgs() {
             case '--help':
                 showHelp();
                 process.exit(0);
-                break;
                 
             case '-l':
             case '--length':
