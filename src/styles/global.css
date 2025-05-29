@@ -18,6 +18,20 @@
     font-weight: normal;
 }
 
+/* 密码保护功能的自定义动画 */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-5px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(3px); }
+    100% { transform: translateX(0); }
+}
+
+.animate-shake {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
 @font-face{
     font-family: 'Misans';
     src: url("/fonts/MiSans-Regular.woff2") format('woff2');

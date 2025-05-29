@@ -1,5 +1,5 @@
 ---
-title: 给Fuwari博客添加密码保护功能
+title: 给Fuwari博客添加密码保护功能（test123）
 published: 2025-05-29
 description: '这是一篇受密码保护的测试文章，密码是 test123'
 image: ''
