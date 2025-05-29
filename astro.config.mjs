@@ -21,113 +21,120 @@ import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 import expressiveCode from "astro-expressive-code";
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers'
 
+import vercel from "@astrojs/vercel";
+
 // https://astro.build/config
 export default defineConfig({
-    site: "https://fuwari.vercel.app/",
-    base: "/",
-    trailingSlash: "always",
-    integrations: [tailwind({
-        nesting: true,
-		}), swup({
-        theme: false,
-        animationClass: "transition-swup-", // see https://swup.js.org/options/#animationselector
-        // the default value `transition-` cause transition delay
-        // when the Tailwind class `transition-all` is used
-        containers: ["main", "#toc"],
-        smoothScrolling: true,
-        cache: true,
-        preload: true,
-        accessibility: true,
-        updateHead: true,
-        updateBodyClass: false,
-        globalInstance: true,
-		}), icon({
-        include: {
-            "preprocess: vitePreprocess(),": ["*"],
-            "fa6-brands": ["*"],
-            "fa6-regular": ["*"],
-            "fa6-solid": ["*"],
-        },
-		}), svelte(), sitemap(), expressiveCode({
-            themes: ["one-dark-pro", "light-plus"],
-            plugins: [
-                pluginLineNumbers(),
-              ],
-            defaultProps: {
-            // Disable line numbers by default
-            wrap: true,
-            showLineNumbers: true,
-            },
-            styleOverrides:{
-                codeFontFamily:"Maple Mono"
-            }
-        }
-        )],
-    markdown: {
-        remarkPlugins: [
-            remarkMath,
-            remarkReadingTime,
-            remarkExcerpt,
-            remarkGithubAdmonitionsToDirectives,
-            remarkDirective,
-            remarkSectionize,
-            parseDirectiveNode,
-        ],
-        rehypePlugins: [
-            rehypeKatex,
-            rehypeSlug,
-            [
-                rehypeComponents,
-                {
-                    components: {
-                        github: GithubCardComponent,
-                        note: (x, y) => AdmonitionComponent(x, y, "note"),
-                        tip: (x, y) => AdmonitionComponent(x, y, "tip"),
-                        important: (x, y) => AdmonitionComponent(x, y, "important"),
-                        caution: (x, y) => AdmonitionComponent(x, y, "caution"),
-                        warning: (x, y) => AdmonitionComponent(x, y, "warning"),
-                    },
-                },
+  site: "https://blog.170529.xyz/",
+  base: "/",
+  trailingSlash: "always",
+
+  integrations: [tailwind({
+      nesting: true,
+      }), swup({
+      theme: false,
+      animationClass: "transition-swup-", // see https://swup.js.org/options/#animationselector
+      // the default value `transition-` cause transition delay
+      // when the Tailwind class `transition-all` is used
+      containers: ["main", "#toc"],
+      smoothScrolling: true,
+      cache: true,
+      preload: true,
+      accessibility: true,
+      updateHead: true,
+      updateBodyClass: false,
+      globalInstance: true,
+      }), icon({
+      include: {
+          "preprocess: vitePreprocess(),": ["*"],
+          "fa6-brands": ["*"],
+          "fa6-regular": ["*"],
+          "fa6-solid": ["*"],
+      },
+      }), svelte(), sitemap(), expressiveCode({
+          themes: ["one-dark-pro", "light-plus"],
+          plugins: [
+              pluginLineNumbers(),
             ],
-            [
-                rehypeAutolinkHeadings,
-                {
-                    behavior: "append",
-                    properties: {
-                        className: ["anchor"],
-                    },
-                    content: {
-                        type: "element",
-                        tagName: "span",
-                        properties: {
-                            className: ["anchor-icon"],
-                            "data-pagefind-ignore": true,
-                        },
-                        children: [
-                            {
-                                type: "text",
-                                value: "#",
-                            },
-                        ],
-                    },
-                },
-            ],
-        ],
-    },
-    vite: {
-        build: {
-            rollupOptions: {
-                onwarn(warning, warn) {
-                    // temporarily suppress this warning
-                    if (
-                        warning.message.includes("is dynamically imported by") &&
-                        warning.message.includes("but also statically imported by")
-                    ) {
-                        return;
-                    }
-                    warn(warning);
-                },
-            },
-        },
-    },
+          defaultProps: {
+          // Disable line numbers by default
+          wrap: true,
+          showLineNumbers: true,
+          },
+          styleOverrides:{
+              codeFontFamily:"Maple Mono"
+          }
+      }
+      )],
+
+  markdown: {
+      remarkPlugins: [
+          remarkMath,
+          remarkReadingTime,
+          remarkExcerpt,
+          remarkGithubAdmonitionsToDirectives,
+          remarkDirective,
+          remarkSectionize,
+          parseDirectiveNode,
+      ],
+      rehypePlugins: [
+          rehypeKatex,
+          rehypeSlug,
+          [
+              rehypeComponents,
+              {
+                  components: {
+                      github: GithubCardComponent,
+                      note: (x, y) => AdmonitionComponent(x, y, "note"),
+                      tip: (x, y) => AdmonitionComponent(x, y, "tip"),
+                      important: (x, y) => AdmonitionComponent(x, y, "important"),
+                      caution: (x, y) => AdmonitionComponent(x, y, "caution"),
+                      warning: (x, y) => AdmonitionComponent(x, y, "warning"),
+                  },
+              },
+          ],
+          [
+              rehypeAutolinkHeadings,
+              {
+                  behavior: "append",
+                  properties: {
+                      className: ["anchor"],
+                  },
+                  content: {
+                      type: "element",
+                      tagName: "span",
+                      properties: {
+                          className: ["anchor-icon"],
+                          "data-pagefind-ignore": true,
+                      },
+                      children: [
+                          {
+                              type: "text",
+                              value: "#",
+                          },
+                      ],
+                  },
+              },
+          ],
+      ],
+  },
+
+  vite: {
+      build: {
+          rollupOptions: {
+              onwarn(warning, warn) {
+                  // temporarily suppress this warning
+                  if (
+                      warning.message.includes("is dynamically imported by") &&
+                      warning.message.includes("but also statically imported by")
+                  ) {
+                      return;
+                  }
+                  warn(warning);
+              },
+          },
+      },
+  },
+
+  adapter: vercel(),
 });
