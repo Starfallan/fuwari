@@ -1,5 +1,6 @@
 ---
 import { UNCATEGORIZED } from "@constants/constants";
+import { Icon } from "astro-icon/components";
 import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
 import { getSortedPosts } from "../utils/content-utils";
@@ -96,19 +97,22 @@ function formatTag(tag: string[]) {
                                 group-active:outline-[var(--btn-plain-bg-active)]
                                 "
                                 ></div>
-                            </div>
-                            <!-- post title -->                            <div class="w-[70%] md:max-w-[65%] md:w-[65%] text-left font-bold
+                            </div>                            <!-- post title -->                            <div class="w-[70%] md:max-w-[65%] md:w-[65%] text-left font-bold
                                 group-hover:translate-x-1 transition-all group-hover:text-[var(--primary)]
                                 text-75 pr-8 whitespace-nowrap overflow-ellipsis overflow-hidden"
                             >
                                     {post.data.title}
-                                    {post.data.password && <span class="ml-2 text-[var(--primary)] opacity-75" title="此文章受密码保护">🔒</span>}
                             </div>
                             <!-- tag list -->
                             <div class="hidden md:block md:w-[15%] text-left text-sm transition
                             whitespace-nowrap overflow-ellipsis overflow-hidden
                             text-30"
-                            >{formatTag(post.data.tags)}</div>
+                            >                                {post.data.password ? (
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-200">
+                                        <Icon name="material-symbols:lock-outline" class="text-xs mr-1" />
+                                        <span class="text-xs font-medium">加密</span>
+                                    </span>
+                                ) : formatTag(post.data.tags)}</div>
                         </div>
                     </a>
                 ))}
