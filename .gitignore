@@ -26,4 +26,4 @@ package-lock.json
 bun.lockb
 yarn.lock
 
-.history
+.history/
