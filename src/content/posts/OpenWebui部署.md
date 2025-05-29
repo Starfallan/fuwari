@@ -52,128 +52,390 @@ networks:
 ```
 
 ## 2. 配置 Nginx （含有 websocket 和缓存加速）
-
-### 主配置文件 `/etc/nginx/nginx.conf`
-```bash title="nginx.conf" ins{4-10}
-# 只需要在原有的 http {} 中添加以下配置即可
-# 其他配置保持不变
-http {
-    # 缓存配置
-    proxy_cache_path /var/cache/nginx
-        levels=1:2
-        keys_zone=nginx_cache:1m
-        max_size=100m
-        inactive=24h
-        use_temp_path=off;
-}
-```
+:::note
+以下配置文件来自于[](https://linux.do/t/topic/677664/)的讨论，经过测试可以正常使用。
+:::
 
 ### 子配置文件 `/etc/nginx/conf.d/openwebui.conf`
 ```bash title="openwebui.conf"
-# 定义上游服务器
-upstream openwebui {
-    server 127.0.0.1:3000;
-}
-
 server {
-    listen 80;
-    listen [::]:80;
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    server_name chat.170529.xyz;
-
-    # SSL 配置
-    ssl_certificate      /etc/letsencrypt/live/chat.170529.xyz/fullchain.pem;
-    ssl_certificate_key  /etc/letsencrypt/live/chat.170529.xyz/privkey.pem;
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256;
-    ssl_prefer_server_ciphers on;
-    ssl_session_cache shared:SSL:10m;
-    ssl_session_timeout 10m;
-
-    # 安全头部
-    add_header Strict-Transport-Security "max-age=31536000";
-    add_header X-Frame-Options SAMEORIGIN;
-    add_header X-Content-Type-Options nosniff;
-    add_header X-XSS-Protection "1; mode=block";
-    add_header Referrer-Policy "strict-origin-when-cross-origin";
-
-    # 日志
+    listen 80 ; 
+    listen 443 ssl; 
+    http2 on;
+    server_name chat.170529.xyz;  # 改域名
     access_log   /var/log/nginx/nginx.openwebui.access.log main;
     error_log    /var/log/nginx/nginx.openwebui.error.log;
-
-    # HTTP 到 HTTPS 重定向
+    ssl_certificate      /etc/letsencrypt/live/chat.170529.xyz/fullchain.pem;
+    ssl_certificate_key  /etc/letsencrypt/live/chat.170529.xyz/privkey.pem;
+    # ==================== 性能優化配置 ====================
+    client_max_body_size 1024M; 
+    tcp_nopush on; 
+    tcp_nodelay on; 
+    keepalive_timeout 65s; 
+    keepalive_requests 1000; 
+    sendfile on; 
+    sendfile_max_chunk 1m; 
+    # ==================== 全域代理緩衝優化 ====================
+    proxy_buffering on; 
+    proxy_buffer_size 128k; 
+    proxy_buffers 4 256k; 
+    proxy_temp_file_write_size 512k; 
+    proxy_busy_buffers_size 256k; 
+    proxy_connect_timeout 60s; 
+    proxy_send_timeout 60s; 
+    proxy_read_timeout 60s; 
+    # Gzip 壓縮
+    gzip on; 
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss application/vnd.ms-fontobject font/ttf font/otf font/woff font/woff2 image/svg+xml; 
+    gzip_min_length 1024; 
+    gzip_comp_level 5; 
+    gzip_http_version 1.1; 
+    gzip_vary on; 
+    gzip_proxied any; 
+    # ==================== 品牌設置變數 ====================
+    set $custom_logo_url https://img.170529.xyz/2025/05/favicon.png; 
+    set $brand_name "Prometheus"; 
+    set $brand_short_name "Prometheus"; 
+    set $static_proxy_host img.170529.xyz; 
+    set $icon_replacement_url '"https://img.170529.xyz/2025/05/favicon.png"'; 
+    set $backend_host http://127.0.0.1:3000;     # port
+    # 分層緩存策略變數
+    set $immutable_cache "public, immutable, max-age=31536000"; # 1年永久緩存
+    set $static_cache "public, max-age=86400"; # 24小時緩存
+    set $static_cache_control "public, max-age=86400"; # 24小時緩存（兼容性變數）
+    set $font_cache "public, max-age=604800"; # 7天緩存（字體可以久一點）
+    set $icon_cache "no-cache, no-store, must-revalidate"; # 圖標無緩存，立即顯示
+    set $html_cache "public, max-age=86400"; # 24小時緩存（OI的index.html較大7KB）
+    # 強制 HTTPS 重定向
     if ($scheme = http) {
-        return 301 https://$host$request_uri;
+        return 301 https://$host$request_uri; 
     }
-    error_page 497 https://$host$request_uri;
-
-    # ACME challenge
-    location ^~ /.well-known/acme-challenge {
-        allow all;
-        root /usr/share/nginx/html;
+    # ==================== 優化緩存策略  ====================
+    # 1. /_app/immutable/ - hash 文件名，永久緩存
+    location ~ ^/_app/immutable/ {
+        proxy_pass $backend_host; 
+        expires max; 
+        access_log off; 
+        add_header Cache-Control $immutable_cache; 
+        proxy_set_header Host $host; 
+        proxy_set_header X-Real-IP $remote_addr; 
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+        proxy_set_header X-Forwarded-Proto https; 
     }
-
-    # 拒绝访问隐藏文件
-    location ~ /\. {
-        deny all;
+    # 2. 字型文件 - 較長緩存 (7天，字體變化不大)
+    location ~* ^/(assets|static)/.*\.(woff|woff2|ttf|eot)$ {
+        proxy_pass $backend_host; 
+        expires 7d; 
+        access_log off; 
+        add_header Cache-Control $font_cache; 
+        proxy_set_header Host $host; 
+        proxy_set_header X-Real-IP $remote_addr; 
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+        proxy_set_header X-Forwarded-Proto https; 
     }
-
-    # models cache
-    location /api/models {
-        proxy_pass http://openwebui;
-        proxy_cache nginx_cache;
-        proxy_cache_key $request_uri;
-        proxy_cache_valid 200 30m;
-        proxy_cache_background_update on;
-        proxy_cache_use_stale updating;
-        proxy_cache_revalidate on;
-        proxy_cache_min_uses 1;
-
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-
-        add_header X-Cache-Status $upstream_cache_status;
+    # 3. /assets/ 和 /static/ 其他文件 - 24小時緩存 (文件名不唯一，不建議永久緩存)
+    location ~* ^/(assets|static)/.*\.(js|css|jpg|jpeg|gif|webp)$ {
+        proxy_pass $backend_host; 
+        expires 1d; 
+        access_log off; 
+        add_header Cache-Control $static_cache; 
+        proxy_set_header Host $host; 
+        proxy_set_header X-Real-IP $remote_addr; 
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+        proxy_set_header X-Forwarded-Proto https; 
     }
-
-    # Static resources browser cache
-    location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)(.*)$ {
-        proxy_pass http://openwebui;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-
-        expires 1d;
-        add_header Cache-Control "public, no-transform";
+    # ==================== 圖標處理配置 ====================
+    # 精確匹配重要圖標路徑 - 最高優先級（避免與正則匹配衝突）
+    location = /static/favicon.png {
+        resolver 1.1.1.1 valid=30s ipv6=off; 
+        proxy_pass $custom_logo_url; 
+        add_header Cache-Control $icon_cache; 
+        proxy_ssl_server_name on; 
+        proxy_ssl_name $static_proxy_host; 
+        proxy_set_header Host $static_proxy_host; 
+        proxy_set_header Referer ""; 
     }
-
-    # 反向代理配置 (通用)
+    location = /static/favicon-96x96.png {
+        resolver 1.1.1.1 valid=30s ipv6=off; 
+        proxy_pass $custom_logo_url; 
+        add_header Cache-Control $icon_cache; 
+        proxy_ssl_server_name on; 
+        proxy_ssl_name $static_proxy_host; 
+        proxy_set_header Host $static_proxy_host; 
+        proxy_set_header Referer ""; 
+    }
+    location = /static/apple-touch-icon.png {
+        resolver 1.1.1.1 valid=30s ipv6=off; 
+        proxy_pass $custom_logo_url; 
+        add_header Cache-Control $icon_cache; 
+        proxy_ssl_server_name on; 
+        proxy_ssl_name $static_proxy_host; 
+        proxy_set_header Host $static_proxy_host; 
+        proxy_set_header Referer ""; 
+        types {
+        }
+        default_type image/png; 
+    }
+    location = /favicon.ico {
+        return 301 /static/favicon.png; 
+    }
+    # iOS Safari 根目錄 apple-touch-icon 處理（關鍵！）
+    location = /apple-touch-icon.png {
+        resolver 1.1.1.1 valid=30s ipv6=off; 
+        proxy_pass $custom_logo_url; 
+        add_header Cache-Control $icon_cache; 
+        proxy_ssl_server_name on; 
+        proxy_ssl_name $static_proxy_host; 
+        proxy_set_header Host $static_proxy_host; 
+        proxy_set_header Referer ""; 
+        types {
+        }
+        default_type image/png; 
+    }
+    # iOS Safari 優先查找的 precomposed 圖標（關鍵！）- 精確匹配優先
+    location = /apple-touch-icon-precomposed.png {
+        resolver 1.1.1.1 valid=30s ipv6=off; 
+        proxy_pass $custom_logo_url; 
+        add_header Cache-Control $icon_cache; 
+        proxy_ssl_server_name on; 
+        proxy_ssl_name $static_proxy_host; 
+        proxy_set_header Host $static_proxy_host; 
+        proxy_set_header Referer ""; 
+        types {
+        }
+        default_type image/png; 
+    }
+    # iOS 會自動查找的各種尺寸 apple-touch-icon
+    location ~ ^/apple-touch-icon-([0-9]+x[0-9]+)\.png$ {
+        resolver 1.1.1.1 valid=30s ipv6=off; 
+        proxy_pass $custom_logo_url; 
+        add_header Cache-Control $icon_cache; 
+        proxy_ssl_server_name on; 
+        proxy_ssl_name $static_proxy_host; 
+        proxy_set_header Host $static_proxy_host; 
+        proxy_set_header Referer ""; 
+        types {
+        }
+        default_type image/png; 
+    }
+    # iOS 其他格式的 apple-touch-icon（兜底方案）
+    location ~ ^/apple-touch-icon-.*\.png$ {
+        resolver 1.1.1.1 valid=30s ipv6=off; 
+        proxy_pass $custom_logo_url; 
+        add_header Cache-Control $icon_cache; 
+        proxy_ssl_server_name on; 
+        proxy_ssl_name $static_proxy_host; 
+        proxy_set_header Host $static_proxy_host; 
+        proxy_set_header Referer ""; 
+        types {
+        }
+        default_type image/png; 
+    }
+    location = /static/favicon.ico {
+        resolver 1.1.1.1 valid=30s ipv6=off; 
+        proxy_pass $custom_logo_url; 
+        add_header Cache-Control $icon_cache; 
+        proxy_ssl_server_name on; 
+        proxy_ssl_name $static_proxy_host; 
+        proxy_set_header Host $static_proxy_host; 
+        proxy_set_header Referer ""; 
+        types {
+        }
+        default_type image/x-icon; 
+    }
+    location = /static/favicon.svg {
+        resolver 1.1.1.1 valid=30s ipv6=off; 
+        proxy_pass $custom_logo_url; 
+        add_header Cache-Control $icon_cache; 
+        proxy_ssl_server_name on; 
+        proxy_ssl_name $static_proxy_host; 
+        proxy_set_header Host $static_proxy_host; 
+        proxy_set_header Referer ""; 
+    }
+    # ==================== 圖標處理配置 ====================
+    # 正則匹配其他圖標（排除已精確匹配的）
+    location ~ ^/static/(logo|logo-dark|favicon-dark|android-chrome-192x192|android-chrome-512x512)\.png$ {
+        resolver 1.1.1.1 valid=30s ipv6=off; 
+        proxy_pass $custom_logo_url; 
+        add_header Cache-Control $icon_cache; 
+        proxy_ssl_server_name on; 
+        proxy_ssl_name $static_proxy_host; 
+        proxy_set_header Host $static_proxy_host; 
+        proxy_set_header Referer ""; 
+    }
+    location ~ ^/static/(splash|splash-dark)\.png$ {
+        resolver 1.1.1.1 valid=30s ipv6=off; 
+        proxy_pass $custom_logo_url; 
+        add_header Cache-Control $icon_cache; 
+        proxy_ssl_server_name on; 
+        proxy_ssl_name $static_proxy_host; 
+        proxy_set_header Host $static_proxy_host; 
+        proxy_set_header Referer ""; 
+    }
+    # 4. manifest.json - 無緩存確保圖標立即顯示
+    location = /manifest.json {
+        proxy_pass $backend_host; 
+        proxy_set_header Host $host; 
+        proxy_set_header X-Real-IP $remote_addr; 
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+        proxy_set_header X-Forwarded-Proto https; 
+        proxy_set_header Accept-Encoding ""; 
+        # 圖標相關配置無緩存，確保立即顯示
+        add_header Cache-Control $icon_cache always; 
+        add_header Pragma "no-cache" always; 
+        add_header Expires "Thu, 01 Jan 1970 00:00:00 GMT" always; 
+        proxy_hide_header ETag; 
+        proxy_hide_header Last-Modified; 
+        sub_filter_types application/json application/manifest+json; 
+        sub_filter_once off; 
+        sub_filter '"name":"Open WebUI"' '"name":"$brand_name"'; 
+        sub_filter '"short_name":"Open WebUI"' '"short_name":"$brand_short_name"'; 
+        sub_filter '"/static/logo.png"' $icon_replacement_url; 
+        sub_filter '"/static/logo-dark.png"' $icon_replacement_url; 
+        sub_filter '"/static/favicon.png"' $icon_replacement_url; 
+        sub_filter '"/static/favicon-96x96.png"' $icon_replacement_url; 
+        sub_filter '"/static/apple-touch-icon.png"' $icon_replacement_url; 
+        sub_filter '"/static/android-chrome-192x192.png"' $icon_replacement_url; 
+        sub_filter '"/static/android-chrome-512x512.png"' $icon_replacement_url; 
+    }
+    # API 配置端點
+    location = /api/config {
+        proxy_pass $backend_host; 
+        proxy_set_header Host $host; 
+        proxy_set_header X-Real-IP $remote_addr; 
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+        proxy_set_header X-Forwarded-Proto https; 
+        proxy_set_header Accept-Encoding ""; 
+        sub_filter_types application/json; 
+        sub_filter_once off; 
+        sub_filter '"name":"Open WebUI"' '"name":"$brand_name"'; 
+        sub_filter '"short_name":"Open WebUI"' '"short_name":"$brand_short_name"'; 
+    }
+    # 認證相關 API
+    location ~ ^/api/(v1/)?auths?/?$ {
+        proxy_pass $backend_host; 
+        proxy_set_header Host $host; 
+        proxy_set_header X-Real-IP $remote_addr; 
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+        proxy_set_header X-Forwarded-Proto https; 
+        proxy_set_header Accept-Encoding ""; 
+        sub_filter_types application/json; 
+        sub_filter_once off; 
+        sub_filter '"name":"Open WebUI"' '"name":"$brand_name"'; 
+        sub_filter '"short_name":"Open WebUI"' '"short_name":"$brand_short_name"'; 
+    }
+    # 其他靜態資源 - 24小時緩存
+    location ~* ^/static/.*\.(html|json|txt|xml)$ {
+        proxy_pass $backend_host; 
+        expires 1d; 
+        access_log off; 
+        add_header Cache-Control $static_cache; 
+        proxy_set_header Host $host; 
+        proxy_set_header X-Real-IP $remote_addr; 
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+        proxy_set_header X-Forwarded-Proto https; 
+    }
+    # 通用靜態文件處理（排除圖標文件，避免衝突）
+    location ~ ^/static/(?!.*\.(png|ico|svg)$).*$ {
+        proxy_pass $backend_host; 
+        expires 1d; 
+        access_log off; 
+        add_header Cache-Control $static_cache; 
+        proxy_set_header Host $host; 
+        proxy_set_header X-Real-IP $remote_addr; 
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+        proxy_set_header X-Forwarded-Proto https; 
+    }
+    # WebSocket 代理
+    location /ws/ {
+        proxy_pass $backend_host; 
+        proxy_http_version 1.1; 
+        proxy_set_header Upgrade $http_upgrade; 
+        proxy_set_header Connection "upgrade"; 
+        proxy_set_header Host $host; 
+        proxy_set_header X-Real-IP $remote_addr; 
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+        proxy_set_header X-Forwarded-Proto https; 
+        # WebSocket 特殊優化 - 覆蓋全域緩衝設置
+        proxy_buffering off; 
+        proxy_cache off; 
+        proxy_connect_timeout 7d; 
+        proxy_send_timeout 7d; 
+        proxy_read_timeout 7d; 
+        proxy_set_header X-Forwarded-Host $server_name; 
+        proxy_set_header X-Forwarded-Server $host; 
+        tcp_nodelay on; 
+    }
+    # 其他 API 端點
+    location /api/ {
+        proxy_pass $backend_host; 
+        proxy_set_header Host $host; 
+        proxy_set_header X-Real-IP $remote_addr; 
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+        proxy_set_header X-Forwarded-Proto https; 
+        proxy_set_header X-Forwarded-Host $server_name; 
+        proxy_set_header Upgrade $http_upgrade; 
+        proxy_set_header Connection $http_connection; 
+        proxy_http_version 1.1; 
+        # API 代理優化設置
+        proxy_buffering on; 
+        proxy_buffer_size 128k; 
+        proxy_buffers 4 256k; 
+        proxy_temp_file_write_size 512k; 
+        proxy_busy_buffers_size 256k; 
+        proxy_connect_timeout 60s; 
+        proxy_send_timeout 60s; 
+        proxy_read_timeout 60s; 
+    }
+    # ==================== SPA 路由處理 ====================
+    # 5. SPA 特定路由 - 24小時緩存 (index.html較大7KB，使用適度緩存)
+    location ~ ^/(auth|error|c/.+)$ {
+        proxy_pass $backend_host; 
+        add_header Cache-Control $html_cache; 
+        proxy_set_header Host $host; 
+        proxy_set_header X-Real-IP $remote_addr; 
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+        proxy_set_header X-Forwarded-Proto https; 
+        proxy_set_header X-Forwarded-Host $server_name; 
+        proxy_set_header Upgrade $http_upgrade; 
+        proxy_set_header Connection $http_connection; 
+        proxy_http_version 1.1; 
+        proxy_set_header Accept-Encoding ""; 
+        sub_filter_types text/html application/json application/manifest+json; 
+        sub_filter_once off; 
+        sub_filter '<title>Open WebUI</title>' '<title>$brand_name</title>'; 
+        sub_filter '"name":"Open WebUI"' '"name":"$brand_name"'; 
+        sub_filter '"short_name":"Open WebUI"' '"short_name":"$brand_short_name"'; 
+        sub_filter '<head>' '<head><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="$brand_name"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png"><link rel="manifest" href="/manifest.json?v=$date_gmt">'; 
+        sub_filter '</body>' '<script>document.addEventListener("DOMContentLoaded",function(){var s=document.createElement("style");s.textContent="#sidebar{transition:all 0.5s cubic-bezier(0.3,0.3,0.2,1)!important;--tw-duration:0.5s;--tw-ease:cubic-bezier(0.3,0.3,0.2,1);}#sidebar[data-state=true]{animation:sidebarFade 0.4s ease-in forwards!important;}@keyframes sidebarFade{0%,30%{opacity:0;}100%{opacity:1;}}";document.head.appendChild(s);});</script></body>'; 
+    }
+    # 主要頁面代理 - index.html (24小時緩存，考慮到文件較大7KB)
     location / {
-        proxy_pass http://openwebui;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-
-        # 禁用流式响应缓冲 (SSE)
-        proxy_buffering off;
-        proxy_cache off;
-
-        # 连接超时设置
-        proxy_connect_timeout 3600s;
-        proxy_read_timeout 3600s;
-        proxy_send_timeout 3600s;
+        proxy_pass $backend_host; 
+        add_header Cache-Control $html_cache; 
+        proxy_set_header Host $host; 
+        proxy_set_header X-Real-IP $remote_addr; 
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+        proxy_set_header X-Forwarded-Proto https; 
+        proxy_set_header X-Forwarded-Host $server_name; 
+        proxy_set_header Upgrade $http_upgrade; 
+        proxy_set_header Connection $http_connection; 
+        proxy_http_version 1.1; 
+        proxy_set_header Accept-Encoding ""; 
+        sub_filter_types text/html application/json application/manifest+json; 
+        sub_filter_once off; 
+        sub_filter '<title>Open WebUI</title>' '<title>$brand_name</title>'; 
+        sub_filter '"name":"Open WebUI"' '"name":"$brand_name"'; 
+        sub_filter '"short_name":"Open WebUI"' '"short_name":"$brand_short_name"'; 
+        sub_filter '<head>' '<head><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="$brand_name"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png"><link rel="manifest" href="/manifest.json?v=$date_gmt">'; 
+        sub_filter '</body>' '<script>document.addEventListener("DOMContentLoaded",function(){var s=document.createElement("style");s.textContent="#sidebar{transition:all 0.5s cubic-bezier(0.3,0.3,0.2,1)!important;--tw-duration:0.5s;--tw-ease:cubic-bezier(0.3,0.3,0.2,1);}#sidebar[data-state=true]{animation:sidebarFade 0.4s ease-in forwards!important;}@keyframes sidebarFade{0%,30%{opacity:0;}100%{opacity:1;}}";document.head.appendChild(s);});</script></body>'; 
     }
+    # ==================== 完美的安全標頭設定 ====================
+    add_header Strict-Transport-Security "max-age=31536000"; 
+    add_header X-Frame-Options DENY always; 
+    add_header X-Content-Type-Options nosniff always; 
+    add_header X-XSS-Protection "1; mode=block" always; 
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always; 
 }
 ```
 
