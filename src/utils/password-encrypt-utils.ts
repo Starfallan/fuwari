@@ -11,24 +11,24 @@
  */
 export async function encrypt(data: string, key: string): Promise<string> {
 	// 确保密钥长度为 16 字节（AES-128）或者扩展到合适长度
-	key = key.padEnd(16, "0");
+	const paddedKey = key.padEnd(16, "0");
 
 	const dataBuffer = Buffer.from(data);
-	const keyBuffer = Buffer.from(key);
+	const keyBuffer = Buffer.from(paddedKey);
 
 	const cryptoKey = await crypto.subtle.importKey(
 		"raw",
 		keyBuffer,
 		{ name: "AES-CBC", length: 256 },
 		false,
-		["encrypt"]
+		["encrypt"],
 	);
 
 	const iv = crypto.getRandomValues(new Uint8Array(16));
 	const encryptedData = await crypto.subtle.encrypt(
 		{ name: "AES-CBC", iv },
 		cryptoKey,
-		dataBuffer
+		dataBuffer,
 	);
 
 	// 将 IV 和加密数据合并
@@ -46,13 +46,13 @@ export async function encrypt(data: string, key: string): Promise<string> {
  * @returns 解密后的文本
  */
 export async function decrypt(data: string, key: string): Promise<string> {
-	key = key.padEnd(16, "0");
+	const paddedKey = key.padEnd(16, "0");
 
 	const decoder = new TextDecoder();
 	const dataBuffer = new Uint8Array(
 		atob(data)
 			.split("")
-			.map(c => c.charCodeAt(0))
+			.map((c) => c.charCodeAt(0)),
 	);
 	const keyBuffer = new TextEncoder().encode(key);
 
@@ -61,7 +61,7 @@ export async function decrypt(data: string, key: string): Promise<string> {
 		keyBuffer,
 		{ name: "AES-CBC", length: 256 },
 		false,
-		["decrypt"]
+		["decrypt"],
 	);
 
 	const iv = dataBuffer.slice(0, 16);
@@ -70,7 +70,7 @@ export async function decrypt(data: string, key: string): Promise<string> {
 	const decryptedData = await crypto.subtle.decrypt(
 		{ name: "AES-CBC", iv },
 		cryptoKey,
-		encryptedData
+		encryptedData,
 	);
 
 	return decoder.decode(decryptedData);
