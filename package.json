@@ -1,8 +1,7 @@
 {
   "name": "fuwari",
   "type": "module",
-  "version": "0.0.1",
-  "scripts": {
+  "version": "0.0.1",  "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build && pagefind --site dist",
@@ -10,6 +9,7 @@
     "astro": "astro",
     "type-check": "tsc --noEmit --isolatedDeclarations",
     "new-post": "node scripts/new-post.js",
+    "generate-password": "node scripts/generate-password.js",
     "format": "biome format --write ./src",
     "lint": "biome check --write ./src",
     "preinstall": "npx only-allow pnpm"

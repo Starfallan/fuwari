@@ -1,0 +1,20 @@
+---
+export interface Props {
+	password: string;
+}
+
+const { password } = Astro.props;
+
+// 获取插槽内容的 HTML
+const html = await Astro.slots.render("default");
+---
+
+{password ? (
+	<div id="encrypted-post-content">
+		<meta name="post-password" content={password} />
+		<meta name="post-html" content={html} />
+		<slot />
+	</div>
+) : (
+	<slot />
+)}

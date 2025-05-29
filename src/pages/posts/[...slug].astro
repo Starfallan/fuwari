@@ -3,6 +3,7 @@ import path from "node:path";
 import ImageWrapper from "@components/misc/ImageWrapper.astro";
 import License from "@components/misc/License.astro";
 import Markdown from "@components/misc/Markdown.astro";
+import PasswordWrapper from "@components/PasswordWrapper.astro";
 import Comments from "@components/widget/Comments.svelte";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
@@ -97,11 +98,10 @@ const jsonLd = {
 
             {entry.data.image &&
                 <ImageWrapper id="post-cover" src={entry.data.image} basePath={path.join("content/posts/", getDir(entry.id))} class="mb-8 rounded-xl banner-container onload-animation"/>
-            }
-
-
-            <Markdown class="mb-6 markdown-content onload-animation">
-                <Content />
+            }            <Markdown class="mb-6 markdown-content onload-animation">
+                <PasswordWrapper password={entry.data.password}>
+                    <Content />
+                </PasswordWrapper>
             </Markdown>
 
             {licenseConfig.enable && <License title={entry.data.title} slug={entry.slug} pubDate={entry.data.published} class="mb-6 rounded-xl license-container onload-animation"></License>}
