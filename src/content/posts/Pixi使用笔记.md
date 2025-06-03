@@ -171,3 +171,21 @@ pixi global install python=3.11 --environment python3-11 --expose python3.11=pyt
 ```
 
 在运行上述命令后，我们的系统上有 python3.10 和 python3.11 可用。
+
+#### 4.4 自定义源
+
+可以更改每个单独项目的源，也可以更改全局源。
+我这里是更改了全局设置
+
+```yaml title='config.toml'
+[pypi-config]
+# Main index url 主镜像设置为清华源
+index-url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+# list of additional urls
+extra-index-urls = ["https://pypi.org/simple"]
+
+
+[mirrors]
+# 重定向所有对conda-forge的请求到清华源
+"https://conda.anaconda.org/conda-forge" = ["https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/"]
+```
