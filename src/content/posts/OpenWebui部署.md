@@ -8,8 +8,11 @@ category: 'AI'
 draft: false 
 lang: ''
 ---
+
 # OpenWebui部署
+
 ## 1. 镜像部署（使用二开版）
+
 ```bash
 services:
   core:
@@ -52,11 +55,13 @@ networks:
 ```
 
 ## 2. 配置 Nginx （含有 websocket 和缓存加速）
+
 :::note
 以下配置文件来自于[](https://linux.do/t/topic/677664/)的讨论，经过测试可以正常使用。
 :::
 
 ### 子配置文件 `/etc/nginx/conf.d/openwebui.conf`
+
 ```bash title="openwebui.conf"
 server {
     listen 80 ; 
@@ -441,14 +446,15 @@ server {
 
 ## 3. 美化配置
 
-> [!NOTE] 
-> 参考来源 https://linux.do/t/topic/440439
+> [!NOTE]
+> 参考来源 <https://linux.do/t/topic/440439>
 
 1. 建立自定义文件夹 `open-webui-assets-custom`
 2. 对应目录下建立 fonts 文件夹，文件夹中放自定义字体
 3. 目录下建立 `custom.js` `custom.css`，具体配置看参考文献，仅修改字体配置
 
 目录结构
+
 ```bash
 open-webui-assets-custom/
     - fonts/
@@ -458,7 +464,9 @@ open-webui-assets-custom/
     - custom.css
     - custom.js
 ```
+
 字体配置的修改
+
 ```bash
 @font-face {
     font-family: 'Maple Mono Normal';

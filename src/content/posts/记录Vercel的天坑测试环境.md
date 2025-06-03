@@ -8,11 +8,12 @@ category: '技术'
 draft: false 
 lang: ''
 ---
-> Cover Image ![Coria](https://space.bilibili.com/7323950/dynamic)
+> Cover Image [Coria](https://space.bilibili.com/7323950/dynamic)
 
 # 记录Vercel的天坑测试环境
 
 ## 前言
+
 因为Fuwari没有自带加密博客的功能，但是觉得这个功能还是挺有用的，所以就想着自己实现一个。
 于是就开始了Fuwari的加密博客功能的开发。在网上找到了对应的资料，并尝试着手实现。这就是[给Fuwari添加加密博客](https://blog.170529.xyz/posts/password-test/)。
 
@@ -20,6 +21,7 @@ lang: ''
 ![Vercel Preview Environment](https://img.170529.xyz/2025/05/20250529230208211.png)
 
 ## Vercel的坑爹Preview环境
+
 因为本地测试没有问题，所以就想着在Vercel的预览环境上进行测试。毕竟这也不敢直接merge到主分支上。于是就开始了Vercel的预览环境测试。
 
 自信满满，直接打开velcel，选择对应的deployment，点击预览环境的链接，发现加密文章的浏览非常正常。本来想着下班收工，可以直接合并到主分支，部署到生产环境了。
@@ -45,6 +47,7 @@ lang: ''
 那就只能实践出真知了，直接merge到主分支，看看生产环境会不会有问题。结果那就是一遍过。生产环境一切正常。真的是自己吓自己。。
 
 ## 总结
+
 Vercel的Preview环境真的是一个天坑。完全不可靠，测试完全不靠谱。建议大家在开发新功能时，在本地测试完后做好措施，如果发现测试环境有问题，可以试试直接在生产环境测试。
 
 毕竟Vercel的Preview环境可能会给你带来意想不到的麻烦。
