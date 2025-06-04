@@ -21,8 +21,6 @@ import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
 import expressiveCode from "astro-expressive-code";
 
-import vercel from "@astrojs/vercel";
-
 // https://astro.build/config
 export default defineConfig({
 	site: "https://blog.170529.xyz/",
@@ -139,8 +137,4 @@ export default defineConfig({
 			},
 		},
 	},
-
-	adapter: vercel({
-		edgeMiddleware: true,
-	}),
 });
