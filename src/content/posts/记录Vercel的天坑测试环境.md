@@ -10,7 +10,6 @@ lang: ''
 ---
 > Cover Image [Coria](https://space.bilibili.com/7323950/dynamic)
 
-# 记录Vercel的天坑测试环境
 
 ## 前言
 
