@@ -10,19 +10,19 @@ lang: ''
 ---
 > Cover image source: [鸦居](https://space.bilibili.com/7198052/dynamic)
 
-
-# 升级Windows自带的OpenSSL
-
 ## 背景
+
 我在尝试使用抓包工具Charles时，教程中提到有一步需要使用`openssl x509 -inform pem -subject_hash_old -in charles.pem`命令来获取证书的指纹。由于Windows自带的OpenSSL版本过低，导致无法使用该命令，因此决定升级OpenSSL。
 
 ## 升级过程
+
 1. 首先，访问[Shining Light Productions](https://slproweb.com/products/Win32OpenSSL.html)下载最新版本的OpenSSL，选择适合你系统的版本（32位或64位），并下载对应的安装包。
     - 或者使用winget命令安装：
+
     ```bash
     winget install -e --id ShiningLight.Light.OpenSSL
     ```
-   
+
 2. 下载完成后，点击对应的安装包进行安装。安装过程中，选择“Copy OpenSSL DLL files to: The Windows system directory”选项，这样可以将OpenSSL的DLL文件复制到Windows系统目录中，方便后续使用。
 
 3. 接下来，需要将OpenSSL的bin目录添加到系统的环境变量中。右键点击“此电脑”，选择“属性”，然后点击“高级系统设置”，在“系统属性”窗口中点击“环境变量”。

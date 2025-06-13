@@ -10,7 +10,6 @@ lang: ''
 ---
 > Cover image source: [ATDAN](https://space.bilibili.com/355143/dynamic)
 
-# 使用Charles在MuMu12上进行抓包
 因为我使用的模拟器是MuMu12，所以需要在MuMu12中配置代理，使其能够通过Charles进行抓包。具体步骤如下：主要参考了[官网教程](https://mumu.163.com/help/20240814/40912_1174291.html)。
 
 但是还是要额外补充一些要注意的点：
