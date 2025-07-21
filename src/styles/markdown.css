@@ -58,7 +58,7 @@
         }
     }
 
-    /* pre {
+    pre {
         @apply bg-[var(--codeblock-bg)] !important;
         @apply rounded-xl px-5;
 
@@ -69,7 +69,7 @@
                 @apply bg-[var(--codeblock-selection)];
             }
         }
-    } */
+    }
 
     ul, ol {
         li::marker {
