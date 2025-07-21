@@ -7,8 +7,11 @@ import { i18n } from "../i18n/translation";
 import { getDir } from "../utils/url-utils";
 import PostMetadata from "./PostMeta.astro";
 import ImageWrapper from "./misc/ImageWrapper.astro";
+
+interface Props {
 	class?: string;
 	entry: CollectionEntry<"posts">;
+    title: string;
 	url: string;
 	published: Date;
 	updated?: Date;
