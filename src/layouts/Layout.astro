@@ -305,7 +305,6 @@ function initCustomScrollbar() {
 			autoHideSuspend: false,
 		},
 	});
-<<<<<<< HEAD
 	// const preElements = document.querySelectorAll('pre');
 	// preElements.forEach((ele) => {
 	// 	OverlayScrollbars(ele, {
@@ -317,15 +316,6 @@ function initCustomScrollbar() {
 	// 		}
 	// 	});
 	// });
-	const katexElements = document.querySelectorAll('.katex-display') as NodeListOf<HTMLElement>;
-	katexElements.forEach((ele) => {
-		OverlayScrollbars(ele, {
-			scrollbars: {
-				theme: 'scrollbar-base scrollbar-auto py-1',
-			}
-		});
-	});
-=======
 	const preElements = document.querySelectorAll('pre');
 	preElements.forEach((ele) => {
 		OverlayScrollbars(ele, {
@@ -381,7 +371,6 @@ function initCustomScrollbar() {
 	katexElements.forEach(element => {
 		katexObserver.observe(element);
 	});
->>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 }
 
 function showBanner() {

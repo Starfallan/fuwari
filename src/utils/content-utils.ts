@@ -67,11 +67,6 @@ export async function getCategoryList(): Promise<Category[]> {
 			count[ucKey] = count[ucKey] ? count[ucKey] + 1 : 1;
 			return;
 		}
-<<<<<<< HEAD
-		count[post.data.category] = count[post.data.category]
-			? count[post.data.category] + 1
-			: 1;
-=======
 
 		const categoryName =
 			typeof post.data.category === "string"
@@ -79,7 +74,6 @@ export async function getCategoryList(): Promise<Category[]> {
 				: String(post.data.category).trim();
 
 		count[categoryName] = count[categoryName] ? count[categoryName] + 1 : 1;
->>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 	});
 
 	const lst = Object.keys(count).sort((a, b) => {
