@@ -36,7 +36,11 @@
     code {
         @apply bg-[var(--inline-code-bg)] text-[var(--inline-code-color)] px-1 py-0.5 rounded-md overflow-hidden;
 
+<<<<<<< HEAD
         font-family: 'ZSFT-443', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+=======
+        font-family: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+>>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
         &:before {
             content:none;
         }
@@ -58,7 +62,11 @@
         }
     }
 
+<<<<<<< HEAD
     /* pre {
+=======
+    pre {
+>>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
         @apply bg-[var(--codeblock-bg)] !important;
         @apply rounded-xl px-5;
 
@@ -69,7 +77,11 @@
                 @apply bg-[var(--codeblock-selection)];
             }
         }
+<<<<<<< HEAD
     } */
+=======
+    }
+>>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 
     ul, ol {
         li::marker {
@@ -91,4 +103,14 @@
         }
 
     }
+<<<<<<< HEAD
+=======
+
+    .katex-display-container {
+        max-width: 100%;
+        overflow-x: auto;
+        margin: 1em 0;
+    }
+    
+>>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 }

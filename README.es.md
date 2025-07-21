@@ -5,7 +5,11 @@ Un tema estático para blogs construido con [Astro](https://astro.build).
 [**🖥️ Demostración en Vivo (Vercel)**](https://fuwari.vercel.app)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;
 [**📦 Versión Antigua de Hexo**](https://github.com/saicaca/hexo-theme-vivia)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;
 
+<<<<<<< HEAD
 > Versión del README: `2024-04-07`
+=======
+> Versión del README: `2025-04-24`
+>>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 
 ![Imagen de Vista Previa](https://raw.githubusercontent.com/saicaca/resource/main/fuwari/home.png)
 
@@ -18,9 +22,45 @@ Un tema estático para blogs construido con [Astro](https://astro.build).
 - [x] Diseño responsivo
 - [ ] Comentarios
 - [x] Buscador
+<<<<<<< HEAD
 - [ ] TOC (Tabla de Contenidos)
 
 ## 🚀 Cómo Usar
+=======
+- [x] TOC (Tabla de Contenidos)
+
+## 👀 requiere
+
+- Node.js <= 22
+- pnpm <= 9
+
+## 🚀 Cómo Usar 1
+
+Inicializa el proyecto localmente usando [create-fuwari](https://github.com/L4Ph/create-fuwari).
+
+```sh
+# npm
+npm create fuwari@latest.
+
+# yarn
+yarn create fuwari.
+
+# pnpm
+pnpm create fuwari@latest
+
+# bun
+bun create fuwari@latest
+
+# deno
+deno run -A npm:create-fuwari@latest
+```
+
+1. Edita el archivo de configuración `src/config.ts` para personalizar tu blog.
+2. Ejecuta `pnpm new-post <nombre-de-archivo>` para crear una nueva entrada y edítala en `src/content/posts/`.
+3. Despliega tu blog en Vercel, Netlify, GitHub Pages, etc., siguiendo [las guías](https://docs.astro.build/en/guides/deploy/). Necesitas editar la configuración del sitio en `astro.config.mjs` antes del despliegue.
+
+## 🚀 Cómo Usar 2
+>>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 
 1. [Genera un nuevo repositorio](https://github.com/saicaca/fuwari/generate) desde esta plantilla o haz un fork de este repositorio.
 2. Para editar tu blog localmente, clona tu repositorio, ejecuta `pnpm install` y `pnpm add sharp` para instalar las dependencias.

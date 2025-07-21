@@ -6,7 +6,11 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
+<<<<<<< HEAD
         sans: ["LXGW GB Lite", "sans-serif", ...defaultTheme.fontFamily.sans],
+=======
+        sans: ["Roboto", "sans-serif", ...defaultTheme.fontFamily.sans],
+>>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
       },
     },
   },

@@ -4,19 +4,43 @@ import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { getSortedPosts } from "@utils/content-utils";
+<<<<<<< HEAD
+=======
+import { decodePathSegment, encodePathSegment } from "@utils/encoding-utils";
+>>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 
 export async function getStaticPaths() {
 	const posts = await getSortedPosts();
 
+<<<<<<< HEAD
 	// タグを集めるための Set の型を指定
 	const allTags = posts.reduce<Set<string>>((acc, post) => {
 		// biome-ignore lint/complexity/noForEach: <explanation>
 		post.data.tags.forEach((tag) => acc.add(tag));
+=======
+	const allTags = posts.reduce<Set<string>>((acc, post) => {
+		if (Array.isArray(post.data.tags)) {
+			// biome-ignore lint/complexity/noForEach: <explanation>
+			post.data.tags.forEach((tag) => {
+				if (typeof tag === "string") {
+					acc.add(tag.trim());
+				} else {
+					acc.add(String(tag).trim());
+				}
+			});
+		} else if (post.data.tags && typeof post.data.tags === "string") {
+			// biome-ignore lint/complexity/noForEach: <explanation>
+			(post.data.tags as string)
+				.split(",")
+				.forEach((tag) => acc.add(tag.trim()));
+		}
+>>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 		return acc;
 	}, new Set());
 
 	const allTagsArray = Array.from(allTags);
 
+<<<<<<< HEAD
 	return allTagsArray.map((tag) => ({
 		params: {
 			tag: encodeURIComponent(tag),
@@ -25,8 +49,41 @@ export async function getStaticPaths() {
 }
 
 const tag = decodeURIComponent(Astro.params.tag as string);
+=======
+	// judge if the string is CJK
+	const isCJK = (str: string) =>
+		/[\u3000-\u9fff\uac00-\ud7af\u4e00-\u9faf]/.test(str);
+
+	const standardPaths = allTagsArray.map((tag) => ({
+		params: {
+			tag: encodePathSegment(tag),
+		},
+		props: {
+			decodedTag: tag,
+		},
+	}));
+
+	const nonEncodedCJKPaths = allTagsArray.filter(isCJK).map((tag) => ({
+		params: {
+			tag: tag, // keep CJK characters unencoded
+		},
+		props: {
+			decodedTag: tag,
+		},
+	}));
+
+	return [...standardPaths, ...nonEncodedCJKPaths];
+}
+
+const { decodedTag } = Astro.props;
+const tag = decodedTag || decodePathSegment(Astro.params.tag as string);
+>>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 ---
 
 <MainGridLayout title={i18n(I18nKey.archive)} description={i18n(I18nKey.archive)}>
     <ArchivePanel tags={[tag]}></ArchivePanel>
+<<<<<<< HEAD
 </MainGridLayout>
+=======
+</MainGridLayout>
+>>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd

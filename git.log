@@ -1,0 +1,13 @@
+错误的合并提交 (M): 找到 Merge remote-tracking branch 'upstream/main' 这一行的 HASH。我们称之为 <merge_commit_hash>。 5eff805
+合并前的最后一个好提交 (B): 找到 Update Openwebui.md 这一行的 HASH。我们称之为 <base_commit_hash>。 bf40345 
+上游被合并的那个提交 (U): 这是最关键的一步。一个合并提交有两个父提交。M^1 是你的分支，M^2 是上游分支。我们需要 M^2 的 HASH。在终端运行以下命令：
+
+git rev-parse 5eff805^2
+
+cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
+
+git reset --hard bf40345
+
+git merge --squash cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
+
+git merge --squash --allow-unrelated-histories cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd

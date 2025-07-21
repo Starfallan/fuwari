@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 关于我
 
 你好！我是星韶纳鸢（Starfallen）。
@@ -44,3 +45,14 @@ Give us a try to sing a rhyme
 “May you, the beauty of this world, always hine.”  
 “你便是世界上的美好，永远闪耀。”  
 &emsp;&emsp;&emsp;&emsp;  &emsp;&emsp;&emsp;&emsp;  &emsp;&emsp;  &emsp;&emsp;   ——《Da Capo》
+=======
+# About
+This is the demo site for [Fuwari](https://github.com/saicaca/fuwari).
+
+::github{repo="saicaca/fuwari"}
+
+> ### Sources of images used in this site
+> - [Unsplash](https://unsplash.com/)
+> - [星と少女](https://www.pixiv.net/artworks/108916539) by [Stella](https://www.pixiv.net/users/93273965)
+> - [Rabbit - v1.4 Showcase](https://civitai.com/posts/586908) by [Rabbit_YourMajesty](https://civitai.com/user/Rabbit_YourMajesty)
+>>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd

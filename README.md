@@ -10,7 +10,11 @@ A static blog template built with [Astro](https://astro.build).
 [**🌏 Español**](https://github.com/saicaca/fuwari/blob/main/README.es.md)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;
 [**🌏 ไทย**](https://github.com/saicaca/fuwari/blob/main/README.th.md)
 
+<<<<<<< HEAD
 > README version: `2024-09-10`
+=======
+> README version: `2025-04-24`
+>>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 
 ![Preview Image](https://raw.githubusercontent.com/saicaca/resource/main/fuwari/home.png)
 
@@ -23,7 +27,41 @@ A static blog template built with [Astro](https://astro.build).
 - [x] Responsive design
 - [ ] Comments
 - [x] Search
+<<<<<<< HEAD
 - [ ] TOC
+=======
+- [x] TOC
+
+## require
+
+- Node.js <= 22
+- pnpm <= 9
+
+## 🚀 How to Use 1
+
+Initialize the project locally using [create-fuwari](https://github.com/L4Ph/create-fuwari).
+
+```sh
+# npm
+npm create fuwari@latest
+
+# yarn
+yarn create fuwari
+
+# pnpm
+pnpm create fuwari@latest
+
+# bun
+bun create fuwari@latest
+
+# deno
+deno run -A npm:create-fuwari@latest
+```
+
+1. Edit the config file `src/config.ts` to customize your blog.
+2. Run `pnpm new-post <filename>` to create a new post and edit it in `src/content/posts/`.
+3. Deploy your blog to Vercel, Netlify, GitHub Pages, etc. following [the guides](https://docs.astro.build/en/guides/deploy/). You need to edit the site configuration in `astro.config.mjs` before deployment.
+>>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 
 ## 🚀 How to Use
 

@@ -1,5 +1,9 @@
 import i18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
+<<<<<<< HEAD
+=======
+import { encodePathSegment } from "./encoding-utils";
+>>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 
 export function pathsEqual(path1: string, path2: string) {
 	const normalizedPath1 = path1.replace(/^\/|\/$/g, "").toLowerCase();
@@ -16,10 +20,34 @@ export function getPostUrlBySlug(slug: string): string {
 	return url(`/posts/${slug}/`);
 }
 
+<<<<<<< HEAD
 export function getCategoryUrl(category: string): string {
 	if (category === i18n(i18nKey.uncategorized))
 		return url("/archive/category/uncategorized/");
 	return url(`/archive/category/${encodeURIComponent(category)}/`);
+=======
+export function getTagUrl(tag: string): string {
+	if (!tag) return url("/archive/tag/");
+
+	// use common encoding function
+	const encodedTag = encodePathSegment(tag);
+	const tagUrl = `/archive/tag/${encodedTag}/`;
+	console.log(`Generating URL for tag "${tag.trim()}" => "${tagUrl}"`);
+	return url(tagUrl);
+}
+
+export function getCategoryUrl(category: string): string {
+	console.log(`category: ${category}`);
+	if (!category) return url("/archive/category/");
+
+	const trimmedCategory = category.trim();
+	if (trimmedCategory === i18n(i18nKey.uncategorized))
+		return url("/archive/category/uncategorized/");
+
+	return url(
+		`/archive/category/${encodeURIComponent(trimmedCategory).replace(/%20/g, "+")}/`,
+	);
+>>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 }
 
 export function getDir(path: string): string {
