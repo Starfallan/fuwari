@@ -46,7 +46,7 @@ export async function encrypt(data: string, key: string): Promise<string> {
  * @returns 解密后的文本
  */
 export async function decrypt(data: string, key: string): Promise<string> {
-	const paddedKey = key.padEnd(16, "0");
+	const _paddedKey = key.padEnd(16, "0");
 
 	const decoder = new TextDecoder();
 	const dataBuffer = new Uint8Array(

@@ -1,4 +1,5 @@
 import type { AUTO_MODE, DARK_MODE, LIGHT_MODE } from "@constants/constants";
+import type * as Giscus from "@giscus/svelte";
 
 export type SiteConfig = {
 	title: string;
@@ -89,4 +90,37 @@ export type BlogPostData = {
 
 export type ExpressiveCodeConfig = {
 	theme: string;
+};
+
+export type CommentConfig = {
+	twikoo?: TwikooConfig;
+	disqus?: DisqusConfig;
+	giscus?: GiscusConfig;
+};
+
+type TwikooConfig = {
+	envId: string;
+	region?: string;
+	lang?: string;
+};
+
+type DisqusConfig = {
+	shortname: string;
+};
+
+type GiscusConfig = {
+	repo: Giscus.Repo;
+	host?: string;
+	repoId: string;
+	category: string;
+	categoryId: string;
+	mapping?: Giscus.Mapping;
+	term?: string;
+	strict?: Giscus.BooleanString;
+	reactionsEnabled?: Giscus.BooleanString;
+	emitMetadata?: Giscus.BooleanString;
+	inputPosition?: Giscus.InputPosition;
+	theme?: Giscus.Theme;
+	lang?: Giscus.AvailableLanguage;
+	loading?: Giscus.Loading;
 };

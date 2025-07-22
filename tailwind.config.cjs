@@ -6,7 +6,11 @@ module.exports = {
 	theme: {
 		extend: {
 			fontFamily: {
-				sans: ["LXGW GB Lite", "sans-serif", ...defaultTheme.fontFamily.sans],
+				sans: [
+					"LXGW WenKai Screen",
+					"sans-serif",
+					...defaultTheme.fontFamily.sans,
+				],
 			},
 		},
 	},

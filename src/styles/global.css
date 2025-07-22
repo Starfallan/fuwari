@@ -1,22 +1,6 @@
-@font-face {
-    font-family: "Maple Mono";
-    src: url("https://fontsapi.zeoseven.com/443/main.woff2") format('woff2'),
-        url("https://fontsapi-storage.zeoseven.com/443/main.woff2") format('woff2');
-    font-display: swap;
-}
+@import url("https://fontsapi.zeoseven.com/442/main/result.css");
 
-@font-face{
-    font-family: 'LXGW WenKai Screen';
-    src: url("/fonts/LXGWWenKaiMonoGBScreen.woff2") format('woff2');
-    font-display: swap;
-}
-
-@font-face{
-    font-family: 'LXGW GB Lite';
-    src: url("/fonts/LXGWWenKaiMonoGBLite.woff2") format('woff2');
-    font-display: swap;
-    font-weight: normal;
-}
+@import url("https://s4.zstatic.net/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/style.min.css");
 
 /* 密码保护功能的自定义动画 */
 @keyframes shake {
@@ -30,11 +14,4 @@
 
 .animate-shake {
     animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-}
-
-@font-face{
-    font-family: 'Misans';
-    src: url("/fonts/MiSans-Regular.woff2") format('woff2');
-    font-display: swap;
-    font-weight: normal;
 }

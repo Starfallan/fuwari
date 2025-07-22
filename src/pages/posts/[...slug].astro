@@ -1,8 +1,9 @@
 ---
 import path from "node:path";
-import PasswordWrapper from "@components/PasswordWrapper.astro";
+import Comment from "@components/comments/index.astro";
 import License from "@components/misc/License.astro";
 import Markdown from "@components/misc/Markdown.astro";
+import PasswordWrapper from "@components/PasswordWrapper.astro";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
@@ -14,7 +15,6 @@ import ImageWrapper from "../../components/misc/ImageWrapper.astro";
 import PostMetadata from "../../components/PostMeta.astro";
 import { profileConfig, siteConfig } from "../../config";
 import { formatDateToYYYYMMDD } from "../../utils/date-utils";
-import Comments from "@components/widget/Comments.svelte";
 
 export async function getStaticPaths() {
 	const blogEntries = await getSortedPosts();
@@ -134,6 +134,6 @@ const jsonLd = {
         </a>
     </div>
 
-    <Comments client:only="svelte"></Comments>
+    <Comment post={entry}></Comment>
 
 </MainGridLayout>
