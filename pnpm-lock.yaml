@@ -32,6 +32,9 @@ importers:
       '@expressive-code/plugin-line-numbers':
         specifier: ^0.41.2
         version: 0.41.2
+      '@fastify/deepmerge':
+        specifier: ^3.1.0
+        version: 3.1.0
       '@fontsource-variable/jetbrains-mono':
         specifier: ^5.2.6
         version: 5.2.6
@@ -143,6 +146,9 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
+      unified:
+        specifier: ^11.0.5
+        version: 11.0.5
       unist-util-visit:
         specifier: ^5.0.0
         version: 5.0.0
@@ -1078,6 +1084,9 @@ packages:
 
   '@expressive-code/plugin-text-markers@0.41.2':
     resolution: {integrity: sha512-JFWBz2qYxxJOJkkWf96LpeolbnOqJY95TvwYc0hXIHf9oSWV0h0SY268w/5N3EtQaD9KktzDE+VIVwb9jdb3nw==}
+
+  '@fastify/deepmerge@3.1.0':
+    resolution: {integrity: sha512-lCVONBQINyNhM6LLezB6+2afusgEYR4G8xenMsfe+AT+iZ7Ca6upM5Ha8UkZuYSnuMw3GWl/BiPXnLMi/gSxuQ==}
 
   '@fontsource-variable/jetbrains-mono@5.2.6':
     resolution: {integrity: sha512-1pvtyK6H1paBOixbtZ9xfQgArVQ4SJMW3WSGZPOd5PiW3yg0t8umwKnjDMzW2ofb7qSdiXnsnIaHPT36vEOdlg==}
@@ -6430,6 +6439,8 @@ snapshots:
   '@expressive-code/plugin-text-markers@0.41.2':
     dependencies:
       '@expressive-code/core': 0.41.2
+
+  '@fastify/deepmerge@3.1.0': {}
 
   '@fontsource-variable/jetbrains-mono@5.2.6': {}
 
