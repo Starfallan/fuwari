@@ -32,6 +32,15 @@ enum I18nKey {
 	author = "author",
 	publishedAt = "publishedAt",
 	license = "license",
+
+	// 密码保护相关
+	passwordProtected = "passwordProtected",
+	passwordPlaceholder = "passwordPlaceholder",
+	passwordHint = "passwordHint",
+	unlockButton = "unlockButton",
+	passwordIncorrect = "passwordIncorrect",
+	passwordSuccess = "passwordSuccess",
+	passwordRetry = "passwordRetry",
 }
 
 export default I18nKey;

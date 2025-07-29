@@ -35,4 +35,13 @@ export const en: Translation = {
 	[Key.author]: "Author",
 	[Key.publishedAt]: "Published at",
 	[Key.license]: "License",
+
+	// Password protection
+	[Key.passwordProtected]: "This post is password protected",
+	[Key.passwordPlaceholder]: "Enter password...",
+	[Key.passwordHint]: "Please enter the password to view the full content",
+	[Key.unlockButton]: "Unlock",
+	[Key.passwordIncorrect]: "Incorrect password, please try again",
+	[Key.passwordSuccess]: "✓ Success",
+	[Key.passwordRetry]: "Retry",
 };
