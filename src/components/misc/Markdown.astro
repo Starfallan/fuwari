@@ -1,10 +1,11 @@
 ---
-import path from "node:path";
 import { getImage } from "astro:assets";
+import path from "node:path";
 import { parseHTML } from "linkedom";
+
 interface Props {
-    class: string;
-    basePath?: string;
+	class: string;
+	basePath?: string;
 }
 const { class: className, basePath = "/" } = Astro.props;
 
@@ -16,33 +17,33 @@ const html = await Astro.slots.render("default");
 const { document } = parseHTML(html);
 
 await (async () => {
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    const modules: Record<string, any> = import.meta.glob(
-        "../../**/*.{jpeg,jpg,png,tiff,webp,gif,svg,avif}",
-    );
-    const re = /^(?![a-zA-Z]+:\/|\/)/;
+	// biome-ignore lint/suspicious/noExplicitAny: 需要使用any类型来处理动态导入的图片模块
+	const modules: Record<string, any> = import.meta.glob(
+		"../../**/*.{jpeg,jpg,png,tiff,webp,gif,svg,avif}",
+	);
+	const re = /^(?![a-zA-Z]+:\/|\/)/;
 
-    for (const img of document.querySelectorAll("img")) {
-        const src = img.getAttribute("src");
-        if (!src || !re.test(src)) continue;
+	for (const img of document.querySelectorAll("img")) {
+		const src = img.getAttribute("src");
+		if (!src || !re.test(src)) continue;
 
-        const normalizedPath = path
-            .normalize(path.join("../../", basePath, src))
-            .replaceAll("\\", "/");
-        const moduleLoader = modules[normalizedPath];
-        if (!moduleLoader) continue;
+		const normalizedPath = path
+			.normalize(path.join("../../", basePath, src))
+			.replaceAll("\\", "/");
+		const moduleLoader = modules[normalizedPath];
+		if (!moduleLoader) continue;
 
-        try {
-            const module = await moduleLoader();
-            const result = await getImage({ src: module.default });
-            img.setAttribute("src", result.src);
-        } catch (error) {
-            console.warn(
-                `Skipping image "${normalizedPath}" due to processing error:`,
-                error,
-            );
-        }
-    }
+		try {
+			const module = await moduleLoader();
+			const result = await getImage({ src: module.default });
+			img.setAttribute("src", result.src);
+		} catch (error) {
+			console.warn(
+				`Skipping image "${normalizedPath}" due to processing error:`,
+				error,
+			);
+		}
+	}
 })();
 ---
 

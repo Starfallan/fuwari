@@ -35,4 +35,14 @@ export const ja: Translation = {
 	[Key.author]: "作者",
 	[Key.publishedAt]: "公開日",
 	[Key.license]: "ライセンス",
+
+	// パスワード保護関連
+	[Key.passwordProtected]: "この記事はパスワードで保護されています",
+	[Key.passwordPlaceholder]: "パスワードを入力...",
+	[Key.passwordHint]:
+		"完全なコンテンツを表示するにはパスワードを入力してください",
+	[Key.unlockButton]: "ロック解除",
+	[Key.passwordIncorrect]: "パスワードが正しくありません。再試行してください",
+	[Key.passwordSuccess]: "✓ 成功",
+	[Key.passwordRetry]: "再試行",
 };

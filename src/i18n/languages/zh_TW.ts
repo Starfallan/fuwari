@@ -35,4 +35,13 @@ export const zh_TW: Translation = {
 	[Key.author]: "作者",
 	[Key.publishedAt]: "發佈於",
 	[Key.license]: "許可協議",
+
+	// 密碼保護相關
+	[Key.passwordProtected]: "此文章受密碼保護",
+	[Key.passwordPlaceholder]: "請輸入密碼...",
+	[Key.passwordHint]: "請輸入密碼以查看完整內容",
+	[Key.unlockButton]: "解鎖",
+	[Key.passwordIncorrect]: "密碼錯誤，請重試",
+	[Key.passwordSuccess]: "✓ 成功",
+	[Key.passwordRetry]: "重試",
 };

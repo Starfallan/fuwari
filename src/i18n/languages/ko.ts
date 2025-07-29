@@ -35,4 +35,13 @@ export const ko: Translation = {
 	[Key.author]: "저자",
 	[Key.publishedAt]: "게시일",
 	[Key.license]: "라이선스",
+
+	// 비밀번호 보호 관련
+	[Key.passwordProtected]: "이 게시물은 비밀번호로 보호되어 있습니다",
+	[Key.passwordPlaceholder]: "비밀번호 입력...",
+	[Key.passwordHint]: "전체 내용을 보려면 비밀번호를 입력하세요",
+	[Key.unlockButton]: "잠금 해제",
+	[Key.passwordIncorrect]: "비밀번호가 올바르지 않습니다. 다시 시도하세요",
+	[Key.passwordSuccess]: "✓ 성공",
+	[Key.passwordRetry]: "재시도",
 };

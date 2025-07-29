@@ -35,4 +35,14 @@ export const es: Translation = {
 	[Key.author]: "Autor",
 	[Key.publishedAt]: "Publicado el",
 	[Key.license]: "Licencia",
+
+	// Protección con contraseña
+	[Key.passwordProtected]: "Esta publicación está protegida con contraseña",
+	[Key.passwordPlaceholder]: "Ingrese la contraseña...",
+	[Key.passwordHint]:
+		"Por favor ingrese la contraseña para ver el contenido completo",
+	[Key.unlockButton]: "Desbloquear",
+	[Key.passwordIncorrect]: "Contraseña incorrecta, por favor intente de nuevo",
+	[Key.passwordSuccess]: "✓ Éxito",
+	[Key.passwordRetry]: "Reintentar",
 };

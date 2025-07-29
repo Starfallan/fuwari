@@ -35,4 +35,13 @@ export const th: Translation = {
 	[Key.author]: "ผู้เขียน",
 	[Key.publishedAt]: "เผยแพร่เมื่อ",
 	[Key.license]: "สัญญาอนุญาต",
+
+	// การป้องกันด้วยรหัสผ่าน
+	[Key.passwordProtected]: "โพสต์นี้ถูกป้องกันด้วยรหัสผ่าน",
+	[Key.passwordPlaceholder]: "ใส่รหัสผ่าน...",
+	[Key.passwordHint]: "กรุณาใส่รหัสผ่านเพื่อดูเนื้อหาทั้งหมด",
+	[Key.unlockButton]: "ปลดล็อก",
+	[Key.passwordIncorrect]: "รหัสผ่านไม่ถูกต้อง โปรดลองอีกครั้ง",
+	[Key.passwordSuccess]: "✓ สำเร็จ",
+	[Key.passwordRetry]: "ลองใหม่",
 };
