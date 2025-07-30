@@ -2,7 +2,7 @@
 title: Fuck Pixi
 published: 2025-06-04
 description: '折腾了3个小时，结果你告诉我Pixi不支持在Global环境下使用Pypi！'
-image: 'https://img.170529.xyz/2025/06/image.png'
+image: 'https://img.170529.xyz/2025/06/image.avif'
 tags: [吐槽, Pixi, Python]
 category: 'Python'
 draft: false
@@ -63,7 +63,7 @@ With no Pixi changes, this now works. Some dependency of keyring pushed a broken
 
 结果就看到了[Allow pypi dependencies in global envs](https://github.com/prefix-dev/pixi/issues/2261)
 
-![Issue](https://img.170529.xyz/2025/06/20250609172636492.png)
+![Issue](https://img.170529.xyz/2025/06/20250609172636492.avif)
 
 这个issue，里面说了Pixia暂不支持在Global环境下使用Pypi。这一个不支持，就拖到了25年6月。还不支持！
 

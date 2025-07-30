@@ -2,7 +2,7 @@
 title: 升级Windows自带的OpenSSL
 published: 2025-05-23
 description: '由于在使用中发现Windows自带的OpenSSL版本过低，导致无法使用某些功能，因此决定升级OpenSSL。但升级过程有些曲折，记录一下。'
-image: 'https://img.170529.xyz/2025/05/20250523180559414.png'
+image: 'https://img.170529.xyz/2025/05/20250523180559414.avif'
 tags: [技术, OpenSSL, Windows]
 category: '技术'
 draft: false 

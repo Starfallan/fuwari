@@ -2,7 +2,7 @@
 title: 使用Charles在MuMu12上进行抓包
 published: 2025-05-23
 description: '使用Charles在MuMu12上进行抓包'
-image: 'https://img.170529.xyz/2025/05/20250523182426410.png'
+image: 'https://img.170529.xyz/2025/05/20250523182426410.avif'
 tags: [Charles, 模拟器]
 category: '技术'
 draft: false 

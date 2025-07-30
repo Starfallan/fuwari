@@ -98,11 +98,11 @@ server {
     gzip_vary on; 
     gzip_proxied any; 
     # ==================== 品牌設置變數 ====================
-    set $custom_logo_url https://img.170529.xyz/2025/05/favicon.png; 
+    set $custom_logo_url https://img.170529.xyz/2025/05/favicon.avif; 
     set $brand_name "Prometheus"; 
     set $brand_short_name "Prometheus"; 
     set $static_proxy_host img.170529.xyz; 
-    set $icon_replacement_url '"https://img.170529.xyz/2025/05/favicon.png"'; 
+    set $icon_replacement_url '"https://img.170529.xyz/2025/05/favicon.avif"'; 
     set $backend_host http://127.0.0.1:3000;     # port
     # 分層緩存策略變數
     set $immutable_cache "public, immutable, max-age=31536000"; # 1年永久緩存

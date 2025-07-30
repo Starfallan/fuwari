@@ -2,7 +2,7 @@
 title: 记录Vercel的天坑测试环境
 published: 2025-05-29
 description: '记录Vercel的天坑测试环境，逆天Vercel的Preview环境测试完全不可靠'
-image: 'https://img.170529.xyz/2025/05/20250529233537727.png'
+image: 'https://img.170529.xyz/2025/05/20250529233537727.avif'
 tags: [技术, 吐槽, Vercel]
 category: '技术'
 draft: false 
@@ -17,7 +17,7 @@ lang: ''
 于是就开始了Fuwari的加密博客功能的开发。在网上找到了对应的资料，并尝试着手实现。这就是[给Fuwari添加加密博客](https://blog.170529.xyz/posts/password-test/)。
 
 自然，在开发新功能的时候，肯定是创建了一个测试分支，来进行测试和开发。而Vercel在检测到分支有更新时，会自动部署到预览环境。如图
-![Vercel Preview Environment](https://img.170529.xyz/2025/05/20250529230208211.png)
+![Vercel Preview Environment](https://img.170529.xyz/2025/05/20250529230208211.avif)
 
 ## Vercel的坑爹Preview环境
 
@@ -28,7 +28,7 @@ lang: ''
 结果当我访问其他非加密文章时，发现页面直接报500了。
 报错`Code: MIDDLEWARE_INVOCATION_FAILED`。
 
-![](https://img.170529.xyz/2025/05/20250529230823351.png)
+![](https://img.170529.xyz/2025/05/20250529230823351.avif)
 
 这下可好了，开始怀疑是不是要开启SSR（服务端渲染）还是哪里配置有问题。
 
@@ -36,7 +36,7 @@ lang: ''
 
 安装完适配器，发现还是一模一样的问题。继续查文档，发现Astro官网关于适配器的文档里有设置edgemiddleware的设置项，便又是添加对应的配置。
 
-![](https://img.170529.xyz/2025/05/20250529231258182.png)
+![](https://img.170529.xyz/2025/05/20250529231258182.avif)
 
 添加完配置后，重新部署，还是一样的问题。500错误。
 这下我就彻底懵了。明明本地测试没问题，为什么Vercel的预览环境就不行了？难道是Vercel的Preview环境有问题？
