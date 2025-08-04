@@ -10,11 +10,11 @@
  * @returns 加密后的 base64 字符串
  */
 export async function encrypt(data: string, key: string): Promise<string> {
-	// 确保密钥长度为 16 字节（AES-128）或者扩展到合适长度
-	const paddedKey = key.padEnd(16, "0");
+	// 确保密钥长度为 32 字节（AES-256）
+	const paddedKey = key.padEnd(32, "0").slice(0, 32);
 
-	const dataBuffer = Buffer.from(data);
-	const keyBuffer = Buffer.from(paddedKey);
+	const dataBuffer = new TextEncoder().encode(data);
+	const keyBuffer = new TextEncoder().encode(paddedKey);
 
 	const cryptoKey = await crypto.subtle.importKey(
 		"raw",
@@ -46,7 +46,7 @@ export async function encrypt(data: string, key: string): Promise<string> {
  * @returns 解密后的文本
  */
 export async function decrypt(data: string, key: string): Promise<string> {
-	const _paddedKey = key.padEnd(16, "0");
+	const paddedKey = key.padEnd(32, "0").slice(0, 32);
 
 	const decoder = new TextDecoder();
 	const dataBuffer = new Uint8Array(
@@ -54,7 +54,7 @@ export async function decrypt(data: string, key: string): Promise<string> {
 			.split("")
 			.map((c) => c.charCodeAt(0)),
 	);
-	const keyBuffer = new TextEncoder().encode(key);
+	const keyBuffer = new TextEncoder().encode(paddedKey);
 
 	const cryptoKey = await crypto.subtle.importKey(
 		"raw",
