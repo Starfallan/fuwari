@@ -7,6 +7,8 @@ category: Examples
 draft: false
 ---
 
+This post is an example of how to use the link card feature in Fuwari. By Hasenpfote in the PR [#324](https://github.com/saicaca/fuwari/pull/324)。Thanks for the contribution!
+
 ## About Link Cards
 
 Link Cards are similar to the `<LinkCard>` component in [Starlight](https://starlight.astro.build), displaying links in a card format.
@@ -37,7 +39,7 @@ https://はじめよう.みんな/
 
 ```
 
-https://astro.build/
+<https://astro.build/>
 
 <https://github.com/saicaca/fuwari/>
 
@@ -45,7 +47,7 @@ https://astro.build/
 
 [/posts/guide/](/posts/guide/)
 
-https://はじめよう.みんな/
+<https://はじめよう.みんな/>
 
 > [!NOTE]
 > Once the cards are displayed, try changing the theme color or enabling dark mode!
