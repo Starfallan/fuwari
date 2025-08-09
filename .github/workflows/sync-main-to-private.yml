@@ -1,0 +1,165 @@
+name: 同步 main 分支到 private 分支
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  sync:
+    name: 同步分支
+    runs-on: ubuntu-latest
+    
+    # 只在推送者不是 GitHub Actions 时运行，避免无限循环
+    if: github.actor != 'github-actions[bot]'
+    
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+        with:
+          # 获取完整的 git 历史记录
+          fetch-depth: 0
+          # 使用 GitHub Token 进行身份验证
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 配置 Git 用户信息
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: 获取所有分支
+        run: |
+          git fetch origin main
+          git fetch origin private || echo "private 分支不存在，将会被创建"
+
+      - name: 检查 private 分支是否存在
+        id: check_branch
+        run: |
+          if git show-ref --verify --quiet refs/remotes/origin/private; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 创建 private 分支（如果不存在）
+        if: steps.check_branch.outputs.exists == 'false'
+        run: |
+          echo "创建 private 分支..."
+          git checkout -b private
+          git push -u origin private
+          echo "✅ private 分支已创建"
+
+      - name: 切换到 private 分支并同步
+        if: steps.check_branch.outputs.exists == 'true'
+        run: |
+          echo "切换到 private 分支..."
+          git checkout private
+          
+          echo "检查是否有冲突..."
+          # 尝试合并，如果有冲突则手动处理
+          if git merge origin/main --no-edit --no-commit; then
+            echo "✅ 自动合并成功"
+            git commit -m "🔄 自动同步 main 分支的更改
+
+            📝 同步内容:
+            - 来自 main 分支的最新功能和改进
+            - 保持 private 分支与公开版本的功能一致性
+            
+            🤖 此提交由 GitHub Actions 自动生成
+            📅 同步时间: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+            🔗 触发提交: ${{ github.sha }}"
+          else
+            echo "⚠️ 检测到合并冲突，需要手动处理"
+            git merge --abort
+            
+            # 创建一个 issue 来通知维护者
+            echo "创建 issue 通知维护者..."
+            
+            # 获取冲突信息
+            CONFLICT_FILES=$(git diff --name-only origin/main...private || echo "无法获取冲突文件列表")
+            
+            # 创建 issue 内容
+            cat > issue_body.md << 'EOF'
+            ## 🚨 分支同步冲突
+
+            在尝试将 `main` 分支的更改同步到 `private` 分支时检测到冲突，需要手动处理。
+
+            ### 📋 详细信息
+            - **触发提交**: [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            - **冲突时间**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+            - **工作流运行**: [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+            ### 🔧 手动解决步骤
+            ```bash
+            # 1. 检出 private 分支
+            git checkout private
+            
+            # 2. 尝试合并 main 分支
+            git merge main
+            
+            # 3. 解决冲突后提交
+            git add .
+            git commit -m "🔧 手动解决合并冲突"
+            
+            # 4. 推送更改
+            git push origin private
+            ```
+
+            ### 📁 可能的冲突文件
+            ```
+            EOF
+            echo "$CONFLICT_FILES" >> issue_body.md
+            echo '```' >> issue_body.md
+            
+            # 使用 GitHub CLI 创建 issue（如果可用）
+            if command -v gh &> /dev/null; then
+              gh issue create \
+                --title "🚨 分支同步冲突 - 需要手动处理" \
+                --body-file issue_body.md \
+                --label "sync,conflict,maintenance" \
+                --assignee "${{ github.actor }}"
+            fi
+            
+            exit 1
+          fi
+
+      - name: 推送更改到 private 分支
+        run: |
+          echo "推送更改到 private 分支..."
+          git push origin private
+          echo "✅ 同步完成！"
+
+      - name: 生成同步报告
+        if: success()
+        run: |
+          echo "## 📊 同步报告" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ 同步成功" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **源分支**: \`main\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **目标分支**: \`private\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **触发提交**: [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
+          echo "- **同步时间**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📝 最近的提交" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          git log --oneline -5 origin/main >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          
+          echo "🎉 private 分支已成功同步 main 分支的最新更改！"
+
+      - name: 错误处理
+        if: failure()
+        run: |
+          echo "## ❌ 同步失败" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "同步过程中遇到错误，请查看工作流日志了解详细信息。" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔧 可能的解决方案" >> $GITHUB_STEP_SUMMARY
+          echo "1. 检查是否存在合并冲突" >> $GITHUB_STEP_SUMMARY
+          echo "2. 手动合并 main 分支到 private 分支" >> $GITHUB_STEP_SUMMARY
+          echo "3. 检查仓库权限设置" >> $GITHUB_STEP_SUMMARY
+          
+          echo "❌ 分支同步失败，请查看日志并手动处理。"

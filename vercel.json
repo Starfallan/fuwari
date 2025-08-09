@@ -1,4 +1,7 @@
 {
+  "git": {
+    "productionBranch": "private"
+  },
   "headers": [
     {
       "source": "/sw.js",

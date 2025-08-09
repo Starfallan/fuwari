@@ -1,0 +1,195 @@
+name: 手动同步分支
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: '源分支 (通常是 main)'
+        required: true
+        default: 'main'
+        type: choice
+        options:
+          - main
+          - develop
+      target_branch:
+        description: '目标分支 (通常是 private)'
+        required: true
+        default: 'private'
+        type: choice
+        options:
+          - private
+          - staging
+      force_sync:
+        description: '强制同步 (将覆盖目标分支的冲突文件)'
+        required: false
+        default: false
+        type: boolean
+      sync_message:
+        description: '同步说明 (可选)'
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  manual-sync:
+    name: 手动分支同步
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 验证输入参数
+        run: |
+          echo "🔍 同步参数验证"
+          echo "源分支: ${{ github.event.inputs.source_branch }}"
+          echo "目标分支: ${{ github.event.inputs.target_branch }}"
+          echo "强制同步: ${{ github.event.inputs.force_sync }}"
+          echo "同步说明: ${{ github.event.inputs.sync_message }}"
+          
+          if [ "${{ github.event.inputs.source_branch }}" == "${{ github.event.inputs.target_branch }}" ]; then
+            echo "❌ 错误: 源分支和目标分支不能相同"
+            exit 1
+          fi
+
+      - name: 检出仓库
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 配置 Git 用户信息
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: 获取分支信息
+        run: |
+          echo "📋 获取分支信息..."
+          git fetch --all
+          
+          echo "可用的远程分支:"
+          git branch -r
+          
+          # 检查源分支是否存在
+          if ! git show-ref --verify --quiet refs/remotes/origin/${{ github.event.inputs.source_branch }}; then
+            echo "❌ 错误: 源分支 '${{ github.event.inputs.source_branch }}' 不存在"
+            exit 1
+          fi
+          
+          # 检查目标分支是否存在
+          if ! git show-ref --verify --quiet refs/remotes/origin/${{ github.event.inputs.target_branch }}; then
+            echo "⚠️ 警告: 目标分支 '${{ github.event.inputs.target_branch }}' 不存在，将会被创建"
+          fi
+
+      - name: 创建目标分支（如果不存在）
+        run: |
+          if ! git show-ref --verify --quiet refs/remotes/origin/${{ github.event.inputs.target_branch }}; then
+            echo "🆕 创建目标分支: ${{ github.event.inputs.target_branch }}"
+            git checkout -b ${{ github.event.inputs.target_branch }} origin/${{ github.event.inputs.source_branch }}
+            git push -u origin ${{ github.event.inputs.target_branch }}
+            echo "✅ 分支 '${{ github.event.inputs.target_branch }}' 已创建"
+          fi
+
+      - name: 执行同步
+        run: |
+          echo "🔄 开始同步..."
+          git checkout ${{ github.event.inputs.target_branch }}
+          
+          # 构建提交消息
+          COMMIT_MSG="🔄 手动同步: ${{ github.event.inputs.source_branch }} → ${{ github.event.inputs.target_branch }}
+
+          📝 同步详情:
+          - 源分支: ${{ github.event.inputs.source_branch }}
+          - 目标分支: ${{ github.event.inputs.target_branch }}
+          - 强制同步: ${{ github.event.inputs.force_sync }}
+          - 操作者: ${{ github.actor }}
+          - 触发时间: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          
+          if [ -n "${{ github.event.inputs.sync_message }}" ]; then
+            COMMIT_MSG="$COMMIT_MSG
+          - 说明: ${{ github.event.inputs.sync_message }}"
+          fi
+          
+          COMMIT_MSG="$COMMIT_MSG
+
+          🤖 此提交由手动同步工作流生成"
+          
+          # 根据强制同步选项执行不同的合并策略
+          if [ "${{ github.event.inputs.force_sync }}" == "true" ]; then
+            echo "⚠️ 强制同步模式: 将强制合并并覆盖冲突"
+            git merge origin/${{ github.event.inputs.source_branch }} -X theirs --no-edit -m "$COMMIT_MSG"
+          else
+            echo "🤝 常规同步模式: 尝试自动合并"
+            if git merge origin/${{ github.event.inputs.source_branch }} --no-edit -m "$COMMIT_MSG"; then
+              echo "✅ 自动合并成功"
+            else
+              echo "❌ 检测到合并冲突"
+              echo "💡 提示: 如需覆盖冲突，请启用'强制同步'选项"
+              
+              # 显示冲突文件
+              echo ""
+              echo "🔍 冲突文件列表:"
+              git diff --name-only --diff-filter=U || echo "无法获取冲突文件列表"
+              
+              echo ""
+              echo "📖 解决冲突的步骤:"
+              echo "1. 本地检出 ${{ github.event.inputs.target_branch }} 分支"
+              echo "2. 运行: git merge origin/${{ github.event.inputs.source_branch }}"
+              echo "3. 手动解决冲突文件"
+              echo "4. 运行: git add . && git commit"
+              echo "5. 推送: git push origin ${{ github.event.inputs.target_branch }}"
+              
+              git merge --abort
+              exit 1
+            fi
+          fi
+
+      - name: 推送更改
+        run: |
+          echo "📤 推送更改到目标分支..."
+          git push origin ${{ github.event.inputs.target_branch }}
+          echo "✅ 同步完成！"
+
+      - name: 生成同步报告
+        if: success()
+        run: |
+          echo "## 📊 手动同步报告" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ 同步成功完成" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| 项目 | 值 |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-----|" >> $GITHUB_STEP_SUMMARY
+          echo "| 源分支 | \`${{ github.event.inputs.source_branch }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 目标分支 | \`${{ github.event.inputs.target_branch }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 强制同步 | ${{ github.event.inputs.force_sync }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 操作者 | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 同步时间 | $(date -u '+%Y-%m-%d %H:%M:%S UTC') |" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -n "${{ github.event.inputs.sync_message }}" ]; then
+            echo "| 同步说明 | ${{ github.event.inputs.sync_message }} |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📈 同步统计" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # 获取最近的几个提交
+          echo "**最近同步的提交:**" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          git log --oneline -5 >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: 错误处理和报告
+        if: failure()
+        run: |
+          echo "## ❌ 手动同步失败" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 同步参数" >> $GITHUB_STEP_SUMMARY
+          echo "- **源分支**: \`${{ github.event.inputs.source_branch }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **目标分支**: \`${{ github.event.inputs.target_branch }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **强制同步**: ${{ github.event.inputs.force_sync }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **操作者**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔧 可能的解决方案" >> $GITHUB_STEP_SUMMARY
+          echo "1. 检查分支是否存在" >> $GITHUB_STEP_SUMMARY
+          echo "2. 如果存在合并冲突，启用'强制同步'选项" >> $GITHUB_STEP_SUMMARY
+          echo "3. 手动解决冲突后再次运行同步" >> $GITHUB_STEP_SUMMARY
+          echo "4. 检查仓库权限设置" >> $GITHUB_STEP_SUMMARY
