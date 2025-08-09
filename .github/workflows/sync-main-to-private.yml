@@ -58,17 +58,14 @@ jobs:
           
           echo "检查是否有冲突..."
           # 尝试合并，如果有冲突则手动处理
-          if git merge origin/main --no-edit --no-commit; then
+          if git merge origin/main --no-edit; then
             echo "✅ 自动合并成功"
-            git commit -m "🔄 自动同步 main 分支的更改
-
-            📝 同步内容:
-            - 来自 main 分支的最新功能和改进
-            - 保持 private 分支与公开版本的功能一致性
-            
-            🤖 此提交由 GitHub Actions 自动生成
-            📅 同步时间: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
-            🔗 触发提交: ${{ github.sha }}"
+            # 检查是否有新的提交需要推送
+            if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/private)" ]; then
+              echo "发现新的提交，准备推送..."
+            else
+              echo "没有新的更改需要同步"
+            fi
           else
             echo "⚠️ 检测到合并冲突，需要手动处理"
             git merge --abort
@@ -96,8 +93,13 @@ jobs:
       - name: 推送更改到 private 分支
         run: |
           echo "推送更改到 private 分支..."
-          git push origin private
-          echo "✅ 同步完成！"
+          # 检查是否有新的提交需要推送
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/private)" ]; then
+            git push origin private
+            echo "✅ 同步完成！新的更改已推送到 private 分支"
+          else
+            echo "✅ 同步完成！没有新的更改需要推送"
+          fi
 
       - name: 生成同步报告
         if: success()
