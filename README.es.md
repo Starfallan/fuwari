@@ -2,14 +2,15 @@
 
 Un tema estático para blogs construido con [Astro](https://astro.build).
 
+Este repositorio está basado en la plantilla original con modificaciones y optimizaciones personales.
+He fusionado varios PRs del repositorio fuente, incluyendo funciones como link-cards e image-caption.
+Los estilos de fuente y configuraciones han sido modificados para satisfacer mejor las necesidades personales.
+Además, para soportar la función de artículos encriptados, he añadido un flujo de trabajo automatizado para sincronizar las ramas main y private.
+
 [**🖥️ Demostración en Vivo (Vercel)**](https://fuwari.vercel.app)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;
 [**📦 Versión Antigua de Hexo**](https://github.com/saicaca/hexo-theme-vivia)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;
 
-<<<<<<< HEAD
-> Versión del README: `2024-04-07`
-=======
 > Versión del README: `2025-04-24`
->>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 
 ![Imagen de Vista Previa](https://raw.githubusercontent.com/saicaca/resource/main/fuwari/home.png)
 

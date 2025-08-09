@@ -2,12 +2,12 @@
 
 [Astro](https://astro.build)로 구축된 정적 블로그 템플릿입니다.
 
-[**🖥️미리보기 (Vercel)**](https://fuwari.vercel.app)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;
-<<<<<<< HEAD
-[**📦Old Hexo Version**](https://github.com/saicaca/hexo-theme-vivia)
+이 저장소는 원본 템플릿을 기반으로 개인적인 수정과 최적화를 진행한 것입니다.
+link-cards, image-caption 등의 기능을 포함하여 소스 저장소의 여러 PR을 병합했습니다.
+개인적인 요구사항에 더 잘 맞도록 폰트 스타일과 설정을 수정했습니다.
+또한, 암호화된 글 기능에 적응하기 위해 main과 private 브랜치의 자동 동기화 워크플로우를 추가했습니다.
 
-> README 버전: `2024-04-07`
-=======
+[**🖥️미리보기 (Vercel)**](https://fuwari.vercel.app)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;
 [**📦Old Hexo Version**](https://github.com/saicaca/hexo-theme-vivia)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;
 [**🌏 English**](https://github.com/saicaca/fuwari/blob/main/README.md)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;
 [**🌏 中文**](https://github.com/saicaca/fuwari/blob/main/README.zh-CN.md)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;
@@ -16,7 +16,6 @@
 [**🌏 ไทย**](https://github.com/saicaca/fuwari/blob/main/README.th.md)
 
 > README 버전: `2025-04-24`
->>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 
 ![Preview Image](https://raw.githubusercontent.com/saicaca/resource/main/fuwari/home.png)
 
@@ -29,9 +28,6 @@
 - [x] 반응형 디자인
 - [ ] 댓글
 - [x] 검색
-<<<<<<< HEAD
-- [ ] 목차
-=======
 - [x] 목차
 
 ## 요구 사항
@@ -64,7 +60,6 @@ deno run -A npm:create-fuwari@latest
 2. `pnpm new-post <filename>`을 실행하여 새 게시물을 만들고 `src/content/posts/`에서 편집하세요.
 3. [가이드](https://docs.astro.build/en/guides/deploy/)에 따라 블로그를 Vercel, Netlify, GitHub 페이지 등에 배포하세요. 배포하기 전에 `astro.config.mjs`에서 사이트 구성을 편집해야 합니다.
 
->>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 ## 🚀 사용하는 방법
 
 1. 이 템플릿에서 [새 저장소를 생성](https://github.com/saicaca/fuwari/generate)하거나 이 저장소를 포크하세요.
@@ -85,10 +80,7 @@ image: /images/cover.jpg
 tags: [푸, 바, 오]
 category: 앞-끝
 draft: false
-<<<<<<< HEAD
-=======
 lang: jp      # 게시물의 언어가 `config.ts`의 사이트 언어와 다른 경우에만 설정합니다.
->>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 ---
 ```
 

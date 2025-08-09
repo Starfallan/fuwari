@@ -6,6 +6,11 @@
 
 A static blog template built with [Astro](https://astro.build).
 
+This repository is based on the original template with personal modifications and optimizations.
+I have merged several PRs from the source repository, including features like link-cards and image-caption.
+Font styles and configurations have been modified to better meet personal needs.
+Additionally, to support the encrypted article feature, I have added an automated workflow to sync main and private branches.
+
 [**🖥️ Live Demo (Vercel)**](https://fuwari.vercel.app)
 
 ![Preview Image](https://raw.githubusercontent.com/saicaca/resource/main/fuwari/home.png)

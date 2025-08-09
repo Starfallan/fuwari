@@ -2,14 +2,15 @@
 
 [Astro](https://astro.build) で構築された静的ブログテンプレート
 
+このリポジトリは、元のテンプレートをベースに個人的な修正と最適化を行ったものです。
+link-cardsやimage-captionなどの機能を含む、ソースリポジトリからの複数のPRをマージしました。
+個人のニーズにより適合するよう、フォントスタイルと設定を修正しました。
+さらに、暗号化記事機能に対応するため、mainブランチとprivateブランチの自動同期ワークフローを追加しました。
+
 [**🖥️ライブデモ (Vercel)**](https://fuwari.vercel.app)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;
 [**📦旧 Hexo バージョン**](https://github.com/saicaca/hexo-theme-vivia)
 
-<<<<<<< HEAD
-> README バージョン：`2024-04-07` 
-=======
 > README バージョン：`2025-04-24`
->>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 
 ![Preview Image](https://raw.githubusercontent.com/saicaca/resource/main/fuwari/home.png)
 
@@ -22,11 +23,6 @@
 - [x] レスポンシブデザイン
 - [ ] コメント機能
 - [x] 検索機能
-<<<<<<< HEAD
-- [ ] 目次
-
-## 🚀 使用方法
-=======
 - [x] 目次
 
 ## 👀 以下が必要
@@ -60,7 +56,6 @@ deno run -A npm:create-fuwari@latest
 3. 作成したブログをVercel、Netlify、GitHub Pagesなどにデプロイするには[ガイド](https://docs.astro.build/ja/guides/deploy/)に従って下さい。加えて、別途デプロイを行う前に `astro.config.mjs` を編集してサイト構成を変更する必要があります。
 
 ## 🚀 使用方法 2
->>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 
 1. [テンプレート](https://github.com/saicaca/fuwari/generate)から新しいリポジトリを作成するかCloneをします。
 2. ブログをローカルで編集するには、リポジトリをクローンした後、`pnpm install` と `pnpm add sharp` を実行して依存関係をインストールします。  

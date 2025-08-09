@@ -73,53 +73,22 @@ jobs:
             echo "⚠️ 检测到合并冲突，需要手动处理"
             git merge --abort
             
-            # 创建一个 issue 来通知维护者
-            echo "创建 issue 通知维护者..."
+            # 创建冲突通知
+            echo "创建冲突通知..."
             
             # 获取冲突信息
-            CONFLICT_FILES=$(git diff --name-only origin/main...private || echo "无法获取冲突文件列表")
+            CONFLICT_FILES=$(git diff --name-only origin/main...private 2>/dev/null || echo "无法获取冲突文件列表")
             
-            # 创建 issue 内容
-            cat > issue_body.md << 'EOF'
-            ## 🚨 分支同步冲突
-
-            在尝试将 `main` 分支的更改同步到 `private` 分支时检测到冲突，需要手动处理。
-
-            ### 📋 详细信息
-            - **触发提交**: [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
-            - **冲突时间**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
-            - **工作流运行**: [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-
-            ### 🔧 手动解决步骤
-            ```bash
-            # 1. 检出 private 分支
-            git checkout private
-            
-            # 2. 尝试合并 main 分支
-            git merge main
-            
-            # 3. 解决冲突后提交
-            git add .
-            git commit -m "🔧 手动解决合并冲突"
-            
-            # 4. 推送更改
-            git push origin private
-            ```
-
-            ### 📁 可能的冲突文件
-            ```
-            EOF
-            echo "$CONFLICT_FILES" >> issue_body.md
-            echo '```' >> issue_body.md
-            
-            # 使用 GitHub CLI 创建 issue（如果可用）
-            if command -v gh &> /dev/null; then
-              gh issue create \
-                --title "🚨 分支同步冲突 - 需要手动处理" \
-                --body-file issue_body.md \
-                --label "sync,conflict,maintenance" \
-                --assignee "${{ github.actor }}"
-            fi
+            echo "检测到分支同步冲突，需要手动处理"
+            echo "冲突时间: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            echo "触发提交: ${{ github.sha }}"
+            echo "可能的冲突文件: $CONFLICT_FILES"
+            echo ""
+            echo "手动解决步骤:"
+            echo "1. git checkout private"
+            echo "2. git merge main"
+            echo "3. 解决冲突后提交"
+            echo "4. git push origin private"
             
             exit 1
           fi

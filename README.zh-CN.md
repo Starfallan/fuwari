@@ -2,6 +2,11 @@
 
 基于 [Astro](https://astro.build) 开发的静态博客模板。
 
+本人在原仓库的基础上，进行了一些个人化的修改和优化。
+如合并了源仓库部分Pr，如link-cards、image-caption等功能。
+修改了部分字体样式和配置，以更好地满足个人需求。
+此外，为了适配加密文章的功能，新增了自动同步main和private分支的工作流。
+
 [**🖥️在线预览（Vercel）**](https://fuwari.vercel.app)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;
 [**📦旧 Hexo 版本**](https://github.com/saicaca/hexo-theme-vivia)
 
