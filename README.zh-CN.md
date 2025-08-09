@@ -2,15 +2,12 @@
 
 基于 [Astro](https://astro.build) 开发的静态博客模板。
 
-本人在原仓库的基础上，进行了一些个人化的修改和优化。
+本人在原仓库的基础上，进行了一些个人化的修改和优化
 如合并了源仓库部分Pr，如link-cards、image-caption等功能。
 修改了部分字体样式和配置，以更好地满足个人需求。
 此外，为了适配加密文章的功能，新增了自动同步main和private分支的工作流。
 
-[**🖥️在线预览（Vercel）**](https://fuwari.vercel.app)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;
-[**📦旧 Hexo 版本**](https://github.com/saicaca/hexo-theme-vivia)
-
-> README 版本：`2024-09-10`
+[**🖥️在线预览（Vercel）**](https://fuwari.vercel.app)
 
 ![Preview Image](https://raw.githubusercontent.com/saicaca/resource/main/fuwari/home.png)
 
@@ -21,11 +18,41 @@
 - [x] 亮色 / 暗色模式
 - [x] 自定义主题色和横幅图片
 - [x] 响应式设计
-- [ ] 评论
+- [x] 评论（支持多种评论系统，如Disqus,Giscus,twikoo）
 - [x] 搜索
-- [ ] 文内目录
+- [x] 文内目录
 
-## 🚀 使用方法
+## 👀 要求
+
+- Node.js <= 22
+- pnpm <= 9
+
+## 🚀 使用方法 1
+
+使用 [create-fuwari](https://github.com/L4Ph/create-fuwari) 在本地初始化项目。
+
+```sh
+# npm
+npm create fuwari@latest
+
+# yarn
+yarn create fuwari
+
+# pnpm
+pnpm create fuwari@latest
+
+# bun
+bun create fuwari@latest
+
+# deno
+deno run -A npm:create-fuwari@latest
+```
+
+1. 通过配置文件 `src/config.ts` 自定义博客
+2. 执行 `pnpm new-post <filename>` 创建新文章，并在 `src/content/posts/` 目录中编辑
+3. 参考[官方指南](https://docs.astro.build/zh-cn/guides/deploy/)将博客部署至 Vercel, Netlify, GitHub Pages 等；部署前需编辑 `astro.config.mjs` 中的站点设置。
+
+## 🚀 使用方法 2
 
 1. 使用此模板[生成新仓库](https://github.com/saicaca/fuwari/generate)或 Fork 此仓库
 2. 进行本地开发，Clone 新的仓库，执行 `pnpm install` 和 `pnpm add sharp` 以安装依赖  
@@ -45,6 +72,7 @@ image: ./cover.jpg
 tags: [Foo, Bar]
 category: Front-end
 draft: false
+password: xxx (optional for encrypted articles)
 lang: jp      # 仅当文章语言与 `config.ts` 中的网站语言不同时需要设置
 ---
 ```

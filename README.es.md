@@ -21,13 +21,8 @@ Además, para soportar la función de artículos encriptados, he añadido un flu
 - [x] Modo claro / oscuro
 - [x] Colores del tema y banner personalizables
 - [x] Diseño responsivo
-- [ ] Comentarios
+- [x] Comentarios
 - [x] Buscador
-<<<<<<< HEAD
-- [ ] TOC (Tabla de Contenidos)
-
-## 🚀 Cómo Usar
-=======
 - [x] TOC (Tabla de Contenidos)
 
 ## 👀 requiere
@@ -61,7 +56,6 @@ deno run -A npm:create-fuwari@latest
 3. Despliega tu blog en Vercel, Netlify, GitHub Pages, etc., siguiendo [las guías](https://docs.astro.build/en/guides/deploy/). Necesitas editar la configuración del sitio en `astro.config.mjs` antes del despliegue.
 
 ## 🚀 Cómo Usar 2
->>>>>>> cb6f97fc49b5b9e8627e3c1507ecd1d5e595b3dd
 
 1. [Genera un nuevo repositorio](https://github.com/saicaca/fuwari/generate) desde esta plantilla o haz un fork de este repositorio.
 2. Para editar tu blog localmente, clona tu repositorio, ejecuta `pnpm install` y `pnpm add sharp` para instalar las dependencias.
@@ -80,6 +74,7 @@ description: Esta es la primera entrada de mi nuevo blog con Astro.
 image: /images/cover.jpg
 tags: [Foo, Bar]
 category: Front-end
+password: xxx (optional for encrypted articles)
 draft: false
 ---
 ```

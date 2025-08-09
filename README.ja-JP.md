@@ -21,7 +21,7 @@ link-cardsやimage-captionなどの機能を含む、ソースリポジトリか
 - [x] ライト/ダークテーマ対応
 - [x] カスタマイズ可能なテーマカラーとバナー
 - [x] レスポンシブデザイン
-- [ ] コメント機能
+- [x] コメント機能
 - [x] 検索機能
 - [x] 目次
 
@@ -74,6 +74,7 @@ description: This is the first post of my new Astro blog.
 image: /images/cover.jpg
 tags: [Foo, Bar]
 category: Front-end
+password: xxx (optional for encrypted articles)
 draft: false
 ---
 ```

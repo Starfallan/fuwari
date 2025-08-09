@@ -26,7 +26,7 @@ link-cards, image-caption 등의 기능을 포함하여 소스 저장소의 여�
 - [x] 라이트 모드 / 다크 모드
 - [x] 사용자 정의 가능한 테마 색상 및 배너
 - [x] 반응형 디자인
-- [ ] 댓글
+- [x] 댓글
 - [x] 검색
 - [x] 목차
 
@@ -80,6 +80,7 @@ image: /images/cover.jpg
 tags: [푸, 바, 오]
 category: 앞-끝
 draft: false
+password: xxx (optional for encrypted articles)
 lang: jp      # 게시물의 언어가 `config.ts`의 사이트 언어와 다른 경우에만 설정합니다.
 ---
 ```
